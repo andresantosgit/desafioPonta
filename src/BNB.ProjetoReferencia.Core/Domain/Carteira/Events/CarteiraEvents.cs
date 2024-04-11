@@ -27,4 +27,11 @@ public record CriarCarteiraEvent(string IdInvestidor, int QuantidadeIntegralizad
 /// </summary>
 /// <param name="Id"></param>
 /// <param name="IdInvestidor"></param>
-public record ExcluirCarteiraEvent(int Id, string IdInvestidor);
+public record CancelarCarteiraEvent(int Id, string IdInvestidor);
+
+/// <summary>
+/// Evento de expiração da carteira
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="IdInvestidor"></param>
+public record ExpirarCarteiraEvent(int Id, string IdInvestidor);

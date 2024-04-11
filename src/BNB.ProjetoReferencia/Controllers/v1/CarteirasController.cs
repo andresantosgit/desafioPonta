@@ -77,14 +77,14 @@ public class CarteirasController : ControllerBase
         [FromRoute] string idInvestidor,
         [FromRoute] int id,
         [FromServices] ICarteiraRepository carteiraRepository,
-        [FromServices] IRequestHandler<DomainEvent<ExcluirCarteiraEvent>> excluirCarteiraEventHandler,
+        [FromServices] IRequestHandler<DomainEvent<CancelarCarteiraEvent>, CarteiraEntity> excluirCarteiraEventHandler,
         CancellationToken cancellationToken)
     {
         var carteiras = await carteiraRepository.FindAllByIdInvestidorAsync(idInvestidor, cancellationToken);
         if (!carteiras.Any(x => x.Id == id))
             return NoContent();
 
-        var evento = this.CriarEventoDominio<ExcluirCarteiraEvent>(new(id, idInvestidor));
+        var evento = this.CriarEventoDominio<CancelarCarteiraEvent>(new(id, idInvestidor));
         await excluirCarteiraEventHandler.Handle(evento, cancellationToken);
 
         return Ok();
