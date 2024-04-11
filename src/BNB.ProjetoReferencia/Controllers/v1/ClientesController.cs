@@ -20,16 +20,17 @@ public class ClientesController : ControllerBase
     /// <param name="clienteRepository"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet("{idInvestidor}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ClienteModel>> Get(
-        [FromRoute] string id,
+        [FromRoute] string idInvestidor,
         [FromServices] IClienteRepository clienteRepository,
         CancellationToken cancellationToken)
     {
-        var cliente = await clienteRepository.FindByIdInvestidorAsync(id, cancellationToken);
+        idInvestidor = Uri.UnescapeDataString(idInvestidor);
+        var cliente = await clienteRepository.FindByIdInvestidorAsync(idInvestidor, cancellationToken);
         if (cliente is null)
             return NoContent();
         return Ok(CriarModelo(cliente));

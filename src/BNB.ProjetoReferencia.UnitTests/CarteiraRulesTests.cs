@@ -68,6 +68,27 @@ public class CarteiraRulesTests
     }
 
     [Fact]
+    public async Task FactoryAsync_CriarCarteiraEvent_Error_QuantidadeAcoesInvalida()
+    {
+        // Arrange
+        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 0);
+
+        _mockCarteiraRepository.Setup(r => r.FindAllByIdInvestidorAsync("014.072.957-72", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CarteiraEntity>());
+
+        _mockClienteRepository.Setup(r => r.FindByIdInvestidorAsync("014.072.957-72", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((ClienteEntity)null);
+
+        // Act
+        var rules = await _rules.FactoryAsync(criarEvent, CancellationToken.None);
+
+
+        // Assert
+        Assert.True(rules.HasErrors());
+        Assert.Contains(rules.Messages, e => e.Message == "Quantidade de ações não pode ser 0.");
+    }
+
+    [Fact]
     public async Task FactoryAsync_CriarCarteiraEvent_Error_QuantidadeAcoesIndisponivel()
     {
         // Arrange

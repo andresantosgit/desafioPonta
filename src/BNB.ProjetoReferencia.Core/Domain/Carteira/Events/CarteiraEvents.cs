@@ -16,7 +16,8 @@ public record CriarCarteiraEvent(string IdInvestidor, int QuantidadeIntegralizad
             IdInvestidor = instace.IdInvestidor,
             DataCriacao = DateTimeOffset.Now,
             DataAtualizacao = DateTimeOffset.Now,
-            QuantidadeIntegralizada = instace.QuantidadeIntegralizada
+            QuantidadeIntegralizada = instace.QuantidadeIntegralizada,
+            TxId = Guid.NewGuid().ToString()
         };
     }
 }

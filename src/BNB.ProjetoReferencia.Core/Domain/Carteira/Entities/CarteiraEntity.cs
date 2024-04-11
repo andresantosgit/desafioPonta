@@ -11,6 +11,11 @@ public class CarteiraEntity : Entity<int>
     public string IdInvestidor { get; set; } = string.Empty;
 
     /// <summary>
+    /// TxId para identificação pagamento PIX
+    /// </summary>
+    public string TxId { get; set; } = string.Empty;
+
+    /// <summary>
     /// Data de criação do manifesto
     /// </summary>
     public DateTimeOffset DataCriacao { get; set; }
@@ -41,10 +46,4 @@ public class CarteiraEntity : Entity<int>
     /// Pendente, Aprovado, Cancelado, Expirado
     /// </summary>
     public string Status { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Status do manifesto
-    /// Pendente, Aprovado, Cancelado, Expirado
-    /// </summary>
-    public string TxId { get; set; } = string.Empty;
 }

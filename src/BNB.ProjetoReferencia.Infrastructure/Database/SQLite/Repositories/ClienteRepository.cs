@@ -1,4 +1,5 @@
 ﻿using BNB.ProjetoReferencia.Core.Common.Attributes;
+using BNB.ProjetoReferencia.Core.Common.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
 using BNB.ProjetoReferencia.Infrastructure.Database.SQLite.Context;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BNB.ProjetoReferencia.Infrastructure.Database.SQLite.Repositories;
 
 [Service(ServiceLifetime.Scoped, typeof(IClienteRepository))]
-public class ClienteRepository : BaseRepository<ClienteEntity, int>, IClienteRepository
+public class ClienteRepository : BaseRepository<ClienteEntity>, IClienteRepository
 {
     public ClienteRepository(ClienteContext weatherForecastContext) :
         base(weatherForecastContext)

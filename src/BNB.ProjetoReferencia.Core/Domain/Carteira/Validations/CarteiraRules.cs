@@ -35,6 +35,7 @@ public class CarteiraRules :
         var quantidadeAtual = carteiras.Where(x => x.Status == "Pendente" || x.Status == "Aprovado").Sum(y => y.QuantidadeIntegralizada);
 
         var rules = Rules.Create()
+            .IsTrue("QuantidadeAcoesInvalida", @event.QuantidadeIntegralizada > 0, "Quantidade de ações não pode ser 0.")
             .NotNull("InvestidorNaoEncontrado", cliente, "Investidor não foi encontrado.")
             .IsTrue("QuantidadeAcoesIndisponivel", (quantidadeAtual + @event.QuantidadeIntegralizada) <= cliente?.DireitoSubscricao, $"Você não pode comprar mais ações que o permitido, disponível: {cliente?.DireitoSubscricao - quantidadeAtual}.")
             ;

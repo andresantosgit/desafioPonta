@@ -3,8 +3,19 @@ using BNB.ProjetoReferencia.Core.Common.Interfaces;
 
 namespace BNB.ProjetoReferencia.Infrastructure.Database.SQLite.Shared;
 
-public abstract class BaseRepository<TEntity, Tkey> : IBaseRepository<TEntity, Tkey>
+public abstract class BaseRepository<TEntity, Tkey> : BaseRepository<TEntity>, IBaseRepository<TEntity, Tkey>
     where TEntity : Entity<Tkey>
+{
+    protected BaseRepository(BaseContext<TEntity> context) : base(context)
+    {
+
+    }
+    public TEntity GetById(Tkey id) => _context.Set.Find(id);
+
+}
+
+public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
+    where TEntity : Entity
 {
     protected readonly BaseContext<TEntity> _context;
 
@@ -18,8 +29,6 @@ public abstract class BaseRepository<TEntity, Tkey> : IBaseRepository<TEntity, T
     public void Delete(TEntity entity) => _context.Remove(entity);
 
     public IEnumerable<TEntity> GetAll() => _context.Set.ToList();
-
-    public TEntity GetById(Tkey id) => _context.Set.Find(id);
 
     public TEntity Update(TEntity entity) => _context.Set.Update(entity).Entity;
 

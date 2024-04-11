@@ -53,6 +53,7 @@ public class CarteirasController : ControllerBase
         [FromServices] ICarteiraRepository carteiraRepository,
         CancellationToken cancellationToken)
     {
+        idInvestidor = Uri.UnescapeDataString(idInvestidor);
         var carteiras = await carteiraRepository.FindAllByIdInvestidorAsync(idInvestidor, cancellationToken);
         if (!carteiras.Any())
             return NoContent();
@@ -80,6 +81,7 @@ public class CarteirasController : ControllerBase
         [FromServices] IRequestHandler<DomainEvent<CancelarCarteiraEvent>, CarteiraEntity> excluirCarteiraEventHandler,
         CancellationToken cancellationToken)
     {
+        idInvestidor = Uri.UnescapeDataString(idInvestidor);
         var carteiras = await carteiraRepository.FindAllByIdInvestidorAsync(idInvestidor, cancellationToken);
         if (!carteiras.Any(x => x.Id == id))
             return NoContent();
