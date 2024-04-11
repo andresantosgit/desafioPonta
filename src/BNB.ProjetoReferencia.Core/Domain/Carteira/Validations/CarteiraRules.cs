@@ -32,7 +32,7 @@ public class CarteiraRules :
     {
         var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(@event.IdInvestidor, cancellationToken);
         var cliente = await _clienteRepository.FindByIdInvestidorAsync(@event.IdInvestidor, cancellationToken);
-        var quantidadeAtual = carteiras.Where(x => x.Status == "Pendente" || x.Status == "Aprovado").Sum(y => y.QuantidadeIntegralizada);
+        var quantidadeAtual = carteiras.Where(x => x.Status == "PENDENTE" || x.Status == "APROVADO").Sum(y => y.QuantidadeIntegralizada);
 
         var rules = Rules.Create()
             .IsTrue("QuantidadeAcoesInvalida", @event.QuantidadeIntegralizada > 0, "Quantidade de ações não pode ser 0.")
