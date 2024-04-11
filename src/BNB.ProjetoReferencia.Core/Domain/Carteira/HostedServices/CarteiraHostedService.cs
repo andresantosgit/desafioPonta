@@ -24,7 +24,7 @@ public class CarteiraHostedService : IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -41,6 +41,7 @@ public class CarteiraHostedService : IHostedService
 
                     foreach (var carteira in carteiras)
                     {
+                        // TODO: Precisamos verificar se a carteira ainda está pendente, chamando a api
                         var evento = new DomainEvent<ExpirarCarteiraEvent>(new (carteira.Id, carteira.IdInvestidor));
                         await expirarCarteiraEventHandler.Handle(evento, cancellationToken);
                     }

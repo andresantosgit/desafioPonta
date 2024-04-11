@@ -1,4 +1,5 @@
 using BNB.ProjetoReferencia.Core.Common.Extensions;
+using BNB.ProjetoReferencia.Core.Domain.Carteira.HostedServices;
 using BNB.ProjetoReferencia.Filters;
 using BNB.ProjetoReferencia.Infrastructure.Common.Extensions;
 using BNB.ProjetoReferencia.Infrastructure.Database;
@@ -76,6 +77,9 @@ builder.Services.AddInfrastructure();
 
 // Adiciona os serviços do Core
 builder.Services.AddCore();
+
+// Adiciona o hosted service da carteira para validação de manifestações expiradas
+builder.Services.AddHostedService<CarteiraHostedService>();
 
 // .AddHttpContextAccessor() é usado em aplicações ASP.NET Core para adicionar o serviço
 // IHttpContextAccessor ao contêiner de injeção de dependência.
