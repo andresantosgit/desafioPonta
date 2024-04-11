@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 
-public class ClienteEntity : Entity<int>
+public class ClienteEntity : Entity
 {
     /// <summary>
     /// Tipo de pessoa
