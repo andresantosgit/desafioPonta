@@ -37,7 +37,7 @@ public class CarteiraRulesTests
             .ReturnsAsync(new List<CarteiraEntity>());
 
         _mockClienteRepository.Setup(r => r.FindByIdInvestidorAsync("014.072.957-72", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(cliente); 
+            .ReturnsAsync(cliente);
 
         // Act
         var rules = await _rules.FactoryAsync(criarEvent, CancellationToken.None);
@@ -61,7 +61,7 @@ public class CarteiraRulesTests
         // Act
         var rules = await _rules.FactoryAsync(criarEvent, CancellationToken.None);
 
-        
+
         // Assert
         Assert.True(rules.HasErrors());
         Assert.Contains(rules.Messages, e => e.Message == "Investidor não foi encontrado.");
@@ -160,7 +160,7 @@ public class CarteiraRulesTests
         var excluirEvent = new CancelarCarteiraEvent(1, "014.072.957-72");
 
         _mockCarteiraRepository.Setup(r => r.FindAllByIdInvestidorAsync("014.072.957-72", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<CarteiraEntity>()); 
+            .ReturnsAsync(new List<CarteiraEntity>());
 
         // Act
         var rules = await _rules.FactoryAsync(excluirEvent, CancellationToken.None);

@@ -4,7 +4,6 @@ using BNB.ProjetoReferencia.Core.Domain.Carteira.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Events;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
-using BNB.ProjetoReferencia.Core.Domain.WeatherForecast.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BNB.ProjetoReferencia.Core.Domain.Carteira.Handlers;

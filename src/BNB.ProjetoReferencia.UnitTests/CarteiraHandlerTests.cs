@@ -14,12 +14,12 @@ public class CarteiraHandlerTests
 {
     private Mock<ICarteiraRepository> _carteiraRepository;
     private Mock<IClienteRepository> _clienteRepository;
-    private Mock<IRules<CriarCarteiraEvent>> _criarCarteiraEventRules;    
+    private Mock<IRules<CriarCarteiraEvent>> _criarCarteiraEventRules;
     private Mock<IRules<CancelarCarteiraEvent>> _cancelarCarteiraEventHandler;
     private Mock<IRules<ExpirarCarteiraEvent>> _expirarCarteiraEventHandler;
     private Mock<Rules> _rules;
 
-    public CarteiraHandler Instance() => 
+    public CarteiraHandler Instance() =>
         new(_carteiraRepository.Object, _clienteRepository.Object, _criarCarteiraEventRules.Object, _cancelarCarteiraEventHandler.Object, _expirarCarteiraEventHandler.Object);
 
     public void ResetMocks()
