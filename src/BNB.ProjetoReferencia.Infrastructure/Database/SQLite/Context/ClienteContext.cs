@@ -15,6 +15,8 @@ public class ClienteContext : BaseContext<ClienteEntity>
     {
         builder.Entity<ClienteEntity>(entity =>
         {
+            entity.ToTable("sub_cliente");
+
             // Indica que é a chave primária
             entity.HasKey(m => m.Id);
 

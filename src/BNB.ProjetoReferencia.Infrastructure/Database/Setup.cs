@@ -11,20 +11,31 @@ public static class Setup
 {
     public static void ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<WeatherForecastContext>(options =>
-        {
-            options.UseSqlite(configuration["Sqlite:ConnectionStringWeatherForecast"]);
-        });
 
         services.AddDbContext<ClienteContext>(options =>
         {
-            options.UseSqlite(configuration["Sqlite:ConnectionStringCliente"]);
+            options.UseSqlServer(configuration["Sql:ConnectionString"]);
         });
 
         services.AddDbContext<CarteiraContext>(options =>
         {
-            options.UseSqlite(configuration["Sqlite:ConnectionStringCarteira"]);
+            options.UseSqlServer(configuration["Sql:ConnectionString"]);
         });
+
+        //services.AddDbContext<WeatherForecastContext>(options =>
+        //{
+        //    options.UseSqlite(configuration["Sqlite:ConnectionStringWeatherForecast"]);
+        //});
+
+        //services.AddDbContext<ClienteContext>(options =>
+        //{
+        //    options.UseSqlite(configuration["Sqlite:ConnectionStringCliente"]);
+        //});
+
+        //services.AddDbContext<CarteiraContext>(options =>
+        //{
+        //    options.UseSqlite(configuration["Sqlite:ConnectionStringCarteira"]);
+        //});
     }
 }
 

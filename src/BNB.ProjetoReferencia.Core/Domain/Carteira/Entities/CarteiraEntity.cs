@@ -41,4 +41,10 @@ public class CarteiraEntity : Entity<int>
     /// Pendente, Aprovado, Cancelado, Expirado
     /// </summary>
     public string Status { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Status do manifesto
+    /// Pendente, Aprovado, Cancelado, Expirado
+    /// </summary>
+    public string TxId { get; set; } = string.Empty;
 }

@@ -15,6 +15,8 @@ public class CarteiraContext : BaseContext<CarteiraEntity>
     {
         builder.Entity<CarteiraEntity>(entity =>
         {
+            entity.ToTable("sub_carteira");
+
             // Indica que é a chave primária
             entity.HasKey(m => m.Id);
 

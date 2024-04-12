@@ -17,8 +17,11 @@ public class CarteiraRepository : BaseRepository<CarteiraEntity, int>, ICarteira
     }
 
     public async Task<List<CarteiraEntity>> FindAllByIdInvestidorAsync(string idInvestidor, CancellationToken cancellationToken)
-        => await _context.Set.Where(x => x.IdInvestidor == idInvestidor).ToListAsync();
+        => await _context.Set.Where(x => x.IdInvestidor == idInvestidor).ToListAsync(cancellationToken);
 
     public async Task<List<CarteiraEntity>> FindAllAsync(CancellationToken cancellationToken)
-        => await _context.Set.ToListAsync();
+        => await _context.Set.ToListAsync(cancellationToken);
+
+    public async Task<List<CarteiraEntity>> FindAllByStatusAndDateAsync(string status, DateTimeOffset minDataCriacao, CancellationToken cancellationToken)
+        => await _context.Set.Where(x => x.Status.Equals(status, StringComparison.InvariantCultureIgnoreCase) && x.DataCriacao >= minDataCriacao).ToListAsync(cancellationToken);
 }
