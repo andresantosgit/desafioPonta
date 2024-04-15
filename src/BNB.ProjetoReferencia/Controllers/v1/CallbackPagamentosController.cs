@@ -1,10 +1,4 @@
-﻿using BNB.ProjetoReferencia.Core.Common.Interfaces;
-using BNB.ProjetoReferencia.Core.Domain.Carteira.Entities;
-using BNB.ProjetoReferencia.Core.Domain.Carteira.Events;
-using BNB.ProjetoReferencia.Extensions;
-using BNB.ProjetoReferencia.Inputs;
-using BNB.ProjetoReferencia.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace BNB.ProjetoReferencia.Controllers.v1;
 

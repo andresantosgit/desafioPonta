@@ -42,7 +42,7 @@ public class CarteiraHostedService : IHostedService
                     foreach (var carteira in carteiras)
                     {
                         // TODO: Precisamos verificar se a carteira ainda está pendente, chamando a api
-                        var evento = new DomainEvent<ExpirarCarteiraEvent>(new (carteira.Id, carteira.IdInvestidor));
+                        var evento = new DomainEvent<ExpirarCarteiraEvent>(new(carteira.Id, carteira.IdInvestidor));
                         await expirarCarteiraEventHandler.Handle(evento, cancellationToken);
                     }
                 }

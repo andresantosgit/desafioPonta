@@ -1,6 +1,5 @@
 ﻿using BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
-using BNB.ProjetoReferencia.Core.Domain.WeatherForecast.Entities;
 using BNB.ProjetoReferencia.Models;
 using Microsoft.AspNetCore.Mvc;
 

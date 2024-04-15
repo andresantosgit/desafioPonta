@@ -8,12 +8,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BNB.ProjetoReferencia.Core.Domain.Carteira.Validations;
 
-[Service(ServiceLifetime.Scoped, 
+[Service(ServiceLifetime.Scoped,
     typeof(IRules<CriarCarteiraEvent>),
     typeof(IRules<CancelarCarteiraEvent>),
     typeof(IRules<ExpirarCarteiraEvent>)
     )]
-public class CarteiraRules : 
+public class CarteiraRules :
     IRules<CriarCarteiraEvent>,
     IRules<CancelarCarteiraEvent>,
     IRules<ExpirarCarteiraEvent>
@@ -50,7 +50,7 @@ public class CarteiraRules :
         var rules = Rules.Create()
             .MinLength("CarteiraSemManifesto", 1, carteiras, "Carteira não possui manifesto.")
             .NotNull("ManifestoNaoEncontrado", carteiras.FirstOrDefault(x => x.Id == @event.Id), "Manifesto não foi encontrado");
-            ;
+        ;
 
         return rules;
     }
