@@ -3,6 +3,7 @@ using BNB.ProjetoReferencia.Core.Domain.Carteira.HostedServices;
 using BNB.ProjetoReferencia.Filters;
 using BNB.ProjetoReferencia.Infrastructure.Common.Extensions;
 using BNB.ProjetoReferencia.Infrastructure.Database;
+using BNB.ProjetoReferencia.Infrastructure.Https;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Internal;
@@ -71,6 +72,9 @@ builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>()
 
 // Configura a Database
 builder.Services.ConfigureDatabase(builder.Configuration);
+
+// Configura o Http
+builder.Services.ConfigureHttp(builder.Configuration);
 
 // Configura os serviços da infraestrutura
 builder.Services.AddInfrastructure();

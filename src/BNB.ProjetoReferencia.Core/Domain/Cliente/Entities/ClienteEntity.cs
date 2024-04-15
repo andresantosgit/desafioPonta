@@ -1,5 +1,4 @@
 ﻿using BNB.ProjetoReferencia.Core.Common.Helper;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 
