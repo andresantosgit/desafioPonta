@@ -1,0 +1,7 @@
+﻿.ui.multiple.dropdown > .label {
+  width: 100%;
+}
+
+.ui.label > .delete.icon {
+  float: right;
+}
