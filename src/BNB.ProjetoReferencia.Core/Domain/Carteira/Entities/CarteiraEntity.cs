@@ -11,6 +11,19 @@ public class CarteiraEntity : Entity<int>
     public string IdInvestidor { get; set; } = string.Empty;
 
     /// <summary>
+    /// Chave para identificação pagamento PIX
+    /// </summary>
+    public string Chave { get; set; } = string.Empty;
+    /// <summary>
+    /// TxId para envio pagamento PIX
+    /// </summary>
+    public string TxId { get; set; } = string.Empty;
+    /// <summary>
+    /// TxId para envio pagamento PIX
+    /// </summary>
+    public string PixCopiaECola { get; set; } = string.Empty;
+
+    /// <summary>
     /// Data de criação do manifesto
     /// </summary>
     public DateTimeOffset DataCriacao { get; set; }
@@ -41,10 +54,9 @@ public class CarteiraEntity : Entity<int>
     /// Pendente, Aprovado, Cancelado, Expirado
     /// </summary>
     public string Status { get; set; } = string.Empty;
-
     /// <summary>
-    /// Status do manifesto
+    /// Matricula de quem realizou a transacao
     /// Pendente, Aprovado, Cancelado, Expirado
     /// </summary>
-    public string TxId { get; set; } = string.Empty;
+    public string Matricula { get; set; } = string.Empty;
 }

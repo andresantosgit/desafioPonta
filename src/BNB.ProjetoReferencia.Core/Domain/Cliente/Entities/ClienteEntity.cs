@@ -2,7 +2,7 @@
 
 namespace BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 
-public class ClienteEntity : Entity<int>
+public class ClienteEntity : Entity
 {
     /// <summary>
     /// Tipo de pessoa
@@ -56,4 +56,29 @@ public class ClienteEntity : Entity<int>
     /// Saldo total em dinheiro que pode ser integralizado
     /// </summary>
     public decimal ValorIntegralizar { get; set; }
+
+    /// <summary>
+    /// Endereco Investidor
+    /// </summary>
+    public string? EnderecoInvestidor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Telefone Investidor
+    /// </summary>
+    public string? TelefoneInvestidor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Email Investidor
+    /// </summary>
+    public string? EmailInvestidor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Matricula de quem realizou à alteração, adicionar campos end, tel e email do investidor
+    /// </summary>
+    public string? Matricula { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Data de atualização do investidor    
+    /// </summary>
+    public DateTimeOffset? DataAtualizacao { get; set; } = DateTimeOffset.MinValue;
 }

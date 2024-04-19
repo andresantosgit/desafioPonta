@@ -22,6 +22,19 @@ public class CarteiraContext : BaseContext<CarteiraEntity>
 
             // Configura o Id para ser autoincremento
             entity.Property(m => m.Id).ValueGeneratedOnAdd();
+
+            entity.Property(t => t.Id).HasColumnName("id");
+            entity.Property(t => t.IdInvestidor).HasColumnName("id_inv");
+            entity.Property(t => t.Chave).HasColumnName("cod_cha");
+            entity.Property(t => t.TxId).HasColumnName("cod_tx");
+            entity.Property(t => t.PixCopiaECola).HasColumnName("cod_pix");
+            entity.Property(t => t.DataCriacao).HasColumnName("dat_cri");
+            entity.Property(t => t.DataAtualizacao).HasColumnName("dat_atu");
+            entity.Property(t => t.QuantidadeIntegralizada).HasColumnName("num_int");
+            entity.Property(t => t.ValorUnitarioPorAcao).HasColumnName("vr_uni_ac");
+            entity.Property(t => t.ValorTotal).HasColumnName("vr_int");
+            entity.Property(t => t.Status).HasColumnName("cod_sta");
+            entity.Property(t => t.Matricula).HasColumnName("cod_mat");
         });
 
         base.OnModelCreating(builder);

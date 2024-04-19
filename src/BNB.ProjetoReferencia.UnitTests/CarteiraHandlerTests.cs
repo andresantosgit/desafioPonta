@@ -6,6 +6,7 @@ using BNB.ProjetoReferencia.Core.Domain.Carteira.Handlers;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
+using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
 using Moq;
 
 namespace BNB.ProjetoReferencia.UnitTests;
@@ -14,13 +15,16 @@ public class CarteiraHandlerTests
 {
     private Mock<ICarteiraRepository> _carteiraRepository;
     private Mock<IClienteRepository> _clienteRepository;
+    private Mock<ICobrancaRepository> _cobrancaRepository;
     private Mock<IRules<CriarCarteiraEvent>> _criarCarteiraEventRules;
     private Mock<IRules<CancelarCarteiraEvent>> _cancelarCarteiraEventHandler;
     private Mock<IRules<ExpirarCarteiraEvent>> _expirarCarteiraEventHandler;
+    private Mock<IRules<AtualizarCarteiraEvent>> _atualizarCarteiraEventHandler;
     private Mock<Rules> _rules;
 
     public CarteiraHandler Instance() =>
-        new(_carteiraRepository.Object, _clienteRepository.Object, _criarCarteiraEventRules.Object, _cancelarCarteiraEventHandler.Object, _expirarCarteiraEventHandler.Object);
+        new(_carteiraRepository.Object, _clienteRepository.Object, _cobrancaRepository.Object, _criarCarteiraEventRules.Object,  
+            _cancelarCarteiraEventHandler.Object, _expirarCarteiraEventHandler.Object, _atualizarCarteiraEventHandler.Object);
 
     public void ResetMocks()
     {
@@ -29,6 +33,7 @@ public class CarteiraHandlerTests
         _criarCarteiraEventRules = new Mock<IRules<CriarCarteiraEvent>>();
         _cancelarCarteiraEventHandler = new Mock<IRules<CancelarCarteiraEvent>>();
         _expirarCarteiraEventHandler = new Mock<IRules<ExpirarCarteiraEvent>>();
+        _atualizarCarteiraEventHandler = new Mock<IRules<AtualizarCarteiraEvent>>();
         _rules = new Mock<Rules>();
     }
 
@@ -40,7 +45,7 @@ public class CarteiraHandlerTests
         ResetMocks();
 
         var handler = Instance();
-        var domainEvent = new DomainEvent<CriarCarteiraEvent>(new("014.072.957-72", 80));
+        var domainEvent = new DomainEvent<CriarCarteiraEvent>(new("014.072.957-72", 80, "000000"));
 
         // Setups
         _criarCarteiraEventRules.Setup(r => r.FactoryAsync(domainEvent.Model, It.IsAny<CancellationToken>()))

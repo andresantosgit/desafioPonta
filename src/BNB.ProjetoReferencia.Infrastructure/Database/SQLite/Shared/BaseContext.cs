@@ -9,7 +9,7 @@ public abstract class BaseContext<TEntity> : DbContext
     public BaseContext(DbContextOptions options)
         : base(options)
     {
-        base.Database.EnsureCreated();
+        //base.Database.EnsureCreated();
     }
 
     public DbSet<TEntity> Set { get; set; }

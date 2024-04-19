@@ -19,12 +19,14 @@ public class CarteiraModel
     {
         Id = entity.Id;
         IdInvestidor = entity.IdInvestidor;
+        TxId = entity.TxId;
         DataCriacao = entity.DataCriacao;
         DataAtualizacao = entity.DataAtualizacao;
         QuantidadeIntegralizada = entity.QuantidadeIntegralizada;
         ValorUnitarioPorAcao = entity.ValorUnitarioPorAcao;
         ValorTotal = entity.ValorTotal;
         Status = entity.Status;
+        PixCopiaECola = entity.PixCopiaECola;
 
         // Adiciona links HATEOAS ao modelo
         Links["self"] = ctrl.Link<CarteirasController>(
@@ -54,6 +56,16 @@ public class CarteiraModel
     /// Id do investidor que efetuou o manifesto
     /// </summary>
     public string IdInvestidor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// TxId para identificação pagamento PIX
+    /// </summary>
+    public string TxId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// PixCopiaECola para pagamento PIX
+    /// </summary>
+    public string PixCopiaECola { get; set; } = string.Empty;
 
     /// <summary>
     /// Data de criação do manifesto

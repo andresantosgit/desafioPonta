@@ -24,6 +24,11 @@ public class ClienteModel
         ValorUnitarioPorAcao = entity.ValorUnitarioPorAcao;
         DireitoSubscricao = entity.DireitoSubscricao;
         QuantidadeIntegralizada = entity.QuantidadeIntegralizada;
+        EnderecoInvestidor = entity.EnderecoInvestidor;
+        TelefoneInvestidor = entity.TelefoneInvestidor;
+        EmailInvestidor = entity.EmailInvestidor;
+        Matricula = entity.Matricula;
+        DataAtualizacao = entity.DataAtualizacao;
 
         // Adiciona links HATEOAS ao modelo
         Links["self"] = ctrl.Link<ClientesController>(
@@ -77,6 +82,30 @@ public class ClienteModel
     /// </summary>
     public int QuantidadeIntegralizada { get; set; }
 
+    /// <summary>
+    /// Endereco Investidor
+    /// </summary>
+    public string? EnderecoInvestidor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Telefone Investidor
+    /// </summary>
+    public string? TelefoneInvestidor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Email Investidor
+    /// </summary>
+    public string? EmailInvestidor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Matricula de quem realizou à alteração, adicionar campos end, tel e email do investidor
+    /// </summary>
+    public string? Matricula { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Data de atualização do investidor    
+    /// </summary>
+    public DateTimeOffset? DataAtualizacao { get; set; } = DateTimeOffset.MinValue;
 
     /// <summary>
     /// Links para ações relacionadas.

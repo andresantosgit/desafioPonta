@@ -22,10 +22,11 @@ public static class Setup
             options.UseSqlServer(configuration["Sql:ConnectionString"]);
         });
 
-        //services.AddDbContext<WeatherForecastContext>(options =>
-        //{
-        //    options.UseSqlite(configuration["Sqlite:ConnectionStringWeatherForecast"]);
-        //});
+        services.AddDbContext<WeatherForecastContext>(options =>
+        {
+            options.UseSqlServer(configuration["Sql:ConnectionString"]);
+            //options.UseSqlite(configuration["Sqlite:ConnectionStringWeatherForecast"]);
+        });
 
         //services.AddDbContext<ClienteContext>(options =>
         //{

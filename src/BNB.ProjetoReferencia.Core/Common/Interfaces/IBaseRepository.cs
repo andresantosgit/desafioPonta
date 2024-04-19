@@ -1,9 +1,13 @@
 ﻿
 namespace BNB.ProjetoReferencia.Core.Common.Interfaces;
 
-public interface IBaseRepository<TEntity, TKey>
+public interface IBaseRepository<TEntity, TKey> : IBaseRepository<TEntity>
 {
     TEntity GetById(TKey id);
+}
+
+public interface IBaseRepository<TEntity>
+{
     IEnumerable<TEntity> GetAll();
     Task<TEntity> AddAsync(TEntity entity, CancellationToken ctx);
     TEntity Update(TEntity entity);

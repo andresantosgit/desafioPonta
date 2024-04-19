@@ -18,13 +18,26 @@ public class ClienteContext : BaseContext<ClienteEntity>
             entity.ToTable("sub_cliente");
 
             // Indica que é a chave primária
-            entity.HasKey(m => m.Id);
-
-            // Configura o Id para ser autoincremento
-            entity.Property(m => m.Id).ValueGeneratedOnAdd();
+            entity.HasKey(m => m.IdInvestidor);
 
             // Configura o IdInvestidor para ser index unico
             entity.HasIndex(m => m.IdInvestidor).IsUnique();
+
+            entity.Property(t => t.IdInvestidor).HasColumnName("id_inv");
+            entity.Property(t => t.TipoPessoa).HasColumnName("cod_tip_pes");
+            entity.Property(t => t.NomeAcionista).HasColumnName("nom_cli");
+            entity.Property(t => t.TipoCustodia).HasColumnName("cod_tip_cst");
+            entity.Property(t => t.ValorUnitarioPorAcao).HasColumnName("vr_uni_ac");
+            entity.Property(t => t.TotalAcoes).HasColumnName("num_ac");
+            entity.Property(t => t.DireitoSubscricao).HasColumnName("num_ac_sub");
+            entity.Property(t => t.QuantidadeIntegralizada).HasColumnName("num_int");
+            entity.Property(t => t.SaldoIntegralizar).HasColumnName("vr_sld_int");
+            entity.Property(t => t.ValorIntegralizar).HasColumnName("vr_int");
+            entity.Property(t => t.EnderecoInvestidor).HasColumnName("cli_end");
+            entity.Property(t => t.TelefoneInvestidor).HasColumnName("cli_tel");
+            entity.Property(t => t.EmailInvestidor).HasColumnName("cli_ema");
+            entity.Property(t => t.Matricula).HasColumnName("cod_mat");
+            entity.Property(t => t.DataAtualizacao).HasColumnName("dat_atu");
         });
 
         base.OnModelCreating(builder);

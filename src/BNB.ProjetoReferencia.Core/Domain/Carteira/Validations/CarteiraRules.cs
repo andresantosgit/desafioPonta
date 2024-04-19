@@ -4,6 +4,7 @@ using BNB.ProjetoReferencia.Core.Common.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Events;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BNB.ProjetoReferencia.Core.Domain.Carteira.Validations;
@@ -11,30 +12,36 @@ namespace BNB.ProjetoReferencia.Core.Domain.Carteira.Validations;
 [Service(ServiceLifetime.Scoped,
     typeof(IRules<CriarCarteiraEvent>),
     typeof(IRules<CancelarCarteiraEvent>),
-    typeof(IRules<ExpirarCarteiraEvent>)
+    typeof(IRules<ExpirarCarteiraEvent>),
+    typeof(IRules<AtualizarCarteiraEvent>)
     )]
 public class CarteiraRules :
     IRules<CriarCarteiraEvent>,
     IRules<CancelarCarteiraEvent>,
-    IRules<ExpirarCarteiraEvent>
+    IRules<ExpirarCarteiraEvent>,
+    IRules<AtualizarCarteiraEvent>
 {
     private readonly ICarteiraRepository _carteiraRepository;
     private readonly IClienteRepository _clienteRepository;
+    private readonly string _statusSaldo;
 
     public CarteiraRules(ICarteiraRepository carteiraRepository,
-                         IClienteRepository clienteRepository)
+                         IClienteRepository clienteRepository,
+                         IConfiguration configuration)
     {
         _carteiraRepository = carteiraRepository;
         _clienteRepository = clienteRepository;
+        _statusSaldo = configuration["StatusSaldo"]!;
     }
 
     public async Task<Rules> FactoryAsync(CriarCarteiraEvent @event, CancellationToken cancellationToken)
     {
         var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(@event.IdInvestidor, cancellationToken);
         var cliente = await _clienteRepository.FindByIdInvestidorAsync(@event.IdInvestidor, cancellationToken);
-        var quantidadeAtual = carteiras.Where(x => x.Status == "Pendente" || x.Status == "Aprovado").Sum(y => y.QuantidadeIntegralizada);
+        var quantidadeAtual = carteiras.Where(x => _statusSaldo.Split(";").Contains(x.Status)).Sum(y => y.QuantidadeIntegralizada);
 
         var rules = Rules.Create()
+            .IsTrue("QuantidadeAcoesInvalida", @event.QuantidadeIntegralizada > 0, "Quantidade de ações não pode ser 0.")
             .NotNull("InvestidorNaoEncontrado", cliente, "Investidor não foi encontrado.")
             .IsTrue("QuantidadeAcoesIndisponivel", (quantidadeAtual + @event.QuantidadeIntegralizada) <= cliente?.DireitoSubscricao, $"Você não pode comprar mais ações que o permitido, disponível: {cliente?.DireitoSubscricao - quantidadeAtual}.")
             ;
@@ -55,6 +62,18 @@ public class CarteiraRules :
     }
 
     public async Task<Rules> FactoryAsync(ExpirarCarteiraEvent @event, CancellationToken cancellationToken)
+    {
+        var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(@event.IdInvestidor, cancellationToken);
+
+        var rules = Rules.Create()
+            .MinLength("CarteiraSemManifesto", 1, carteiras, "Carteira não possui manifesto.")
+            .NotNull("ManifestoNaoEncontrado", carteiras.FirstOrDefault(x => x.Id == @event.Id), "Manifesto não foi encontrado");
+        ;
+
+        return rules;
+    }
+
+    public async Task<Rules> FactoryAsync(AtualizarCarteiraEvent @event, CancellationToken cancellationToken)
     {
         var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(@event.IdInvestidor, cancellationToken);
 
