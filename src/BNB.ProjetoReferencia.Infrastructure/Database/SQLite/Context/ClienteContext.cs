@@ -33,6 +33,11 @@ public class ClienteContext : BaseContext<ClienteEntity>
             entity.Property(t => t.QuantidadeIntegralizada).HasColumnName("num_int");
             entity.Property(t => t.SaldoIntegralizar).HasColumnName("vr_sld_int");
             entity.Property(t => t.ValorIntegralizar).HasColumnName("vr_int");
+            entity.Property(t => t.EnderecoInvestidor).HasColumnName("cli_end");
+            entity.Property(t => t.TelefoneInvestidor).HasColumnName("cli_tel");
+            entity.Property(t => t.EmailInvestidor).HasColumnName("cli_ema");
+            entity.Property(t => t.Matricula).HasColumnName("cod_mat");
+            entity.Property(t => t.DataAtualizacao).HasColumnName("dat_atu");
         });
 
         base.OnModelCreating(builder);

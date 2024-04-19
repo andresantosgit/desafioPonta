@@ -6,6 +6,7 @@ using BNB.ProjetoReferencia.Extensions;
 using BNB.ProjetoReferencia.Inputs;
 using BNB.ProjetoReferencia.Models;
 using Microsoft.AspNetCore.Mvc;
+using QRCoder;
 
 namespace BNB.ProjetoReferencia.Controllers.v1;
 
@@ -59,6 +60,32 @@ public class CarteirasController : ControllerBase
             return NoContent();
 
         return Ok(carteiras.Select(x => CriarModelo(x)).ToList());
+    }
+
+    /// <summary>
+    /// Retorna QrCode para pagamento
+    /// </summary>
+    /// <param name="idCarteira"></param>
+    /// <returns></returns>
+    [HttpGet("qrCode/{idCarteira}")]    
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<List<string>>> Get(
+        [FromRoute] int idCarteira,        
+        [FromServices] ICarteiraRepository carteiraRepository,
+        CancellationToken cancellationToken)
+    {
+        var carteira = carteiraRepository.GetById(idCarteira);
+        if (carteira == null)
+            return NoContent();
+
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode(carteira.PixCopiaECola, QRCodeGenerator.ECCLevel.Q);        
+        BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
+        string qrCodeBase64 = Convert.ToBase64String(qrCode.GetGraphic(10));
+
+        return Ok(qrCodeBase64);
     }
 
     /// <summary>

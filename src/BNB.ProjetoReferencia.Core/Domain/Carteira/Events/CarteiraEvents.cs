@@ -7,7 +7,8 @@ namespace BNB.ProjetoReferencia.Core.Domain.Carteira.Events;
 /// </summary>
 /// <param name="IdInvestidor"></param>
 /// <param name="QuantidadeIntegralizada"></param>
-public record CriarCarteiraEvent(string IdInvestidor, int QuantidadeIntegralizada)
+/// <param name="Matricula"></param>
+public record CriarCarteiraEvent(string IdInvestidor, int QuantidadeIntegralizada, string Matricula)
 {
     public static implicit operator CarteiraEntity(CriarCarteiraEvent instace)
     {
@@ -17,7 +18,8 @@ public record CriarCarteiraEvent(string IdInvestidor, int QuantidadeIntegralizad
             DataCriacao = DateTimeOffset.Now,
             DataAtualizacao = DateTimeOffset.Now,
             QuantidadeIntegralizada = instace.QuantidadeIntegralizada,
-            TxId = Guid.NewGuid().ToString()
+            Chave = Guid.NewGuid().ToString(),
+            Matricula = instace.Matricula
         };
     }
 }
@@ -36,3 +38,18 @@ public record CancelarCarteiraEvent(int Id, string IdInvestidor);
 /// <param name="Id"></param>
 /// <param name="IdInvestidor"></param>
 public record ExpirarCarteiraEvent(int Id, string IdInvestidor);
+
+/// <summary>
+/// Evento de expiração da carteira
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="IdInvestidor"></param>
+/// <param name="Status"></param>
+public record AtualizarCarteiraEvent(int Id, string IdInvestidor, string Status);
+
+/// <summary>
+/// Evento de atualiazação de carteira
+/// </summary>
+public record CallbackEvent(List<PixEntity> listPix);
+
+

@@ -5,6 +5,7 @@ using BNB.ProjetoReferencia.Core.Domain.Carteira.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Validations;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
+using Castle.Core.Configuration;
 using Moq;
 
 namespace BNB.ProjetoReferencia.UnitTests;
@@ -12,13 +13,15 @@ public class CarteiraRulesTests
 {
     private readonly Mock<ICarteiraRepository> _mockCarteiraRepository;
     private readonly Mock<IClienteRepository> _mockClienteRepository;
+    private readonly Mock<Microsoft.Extensions.Configuration.IConfiguration> _mockConfiguration;
     private readonly CarteiraRules _rules;
 
     public CarteiraRulesTests()
     {
         _mockCarteiraRepository = new Mock<ICarteiraRepository>();
         _mockClienteRepository = new Mock<IClienteRepository>();
-        _rules = new CarteiraRules(_mockCarteiraRepository.Object, _mockClienteRepository.Object);
+        _mockConfiguration = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
+        _rules = new CarteiraRules(_mockCarteiraRepository.Object, _mockClienteRepository.Object, _mockConfiguration.Object);
     }
 
     [Fact]
@@ -31,7 +34,7 @@ public class CarteiraRulesTests
             DireitoSubscricao = 100
         };
 
-        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 80);
+        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 80, "000000");
 
         _mockCarteiraRepository.Setup(r => r.FindAllByIdInvestidorAsync("014.072.957-72", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<CarteiraEntity>());
@@ -50,7 +53,7 @@ public class CarteiraRulesTests
     public async Task FactoryAsync_CriarCarteiraEvent_Error_InvestidorNaoEncontrado()
     {
         // Arrange
-        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 80);
+        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 80, "000000");
 
         _mockCarteiraRepository.Setup(r => r.FindAllByIdInvestidorAsync("014.072.957-72", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<CarteiraEntity>());
@@ -71,7 +74,7 @@ public class CarteiraRulesTests
     public async Task FactoryAsync_CriarCarteiraEvent_Error_QuantidadeAcoesInvalida()
     {
         // Arrange
-        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 0);
+        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 0, "000000");
 
         _mockCarteiraRepository.Setup(r => r.FindAllByIdInvestidorAsync("014.072.957-72", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<CarteiraEntity>());
@@ -92,7 +95,7 @@ public class CarteiraRulesTests
     public async Task FactoryAsync_CriarCarteiraEvent_Error_QuantidadeAcoesIndisponivel()
     {
         // Arrange
-        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 80);
+        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 80, "000000");
 
         var cliente = new ClienteEntity()
         {
@@ -117,7 +120,7 @@ public class CarteiraRulesTests
     public async Task FactoryAsync_CriarCarteiraEvent_Error_QuantidadeAcoesIndisponivelComCarteira()
     {
         // Arrange
-        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 11);
+        var criarEvent = new CriarCarteiraEvent("014.072.957-72", 11, "000000");
 
         var carteira = new List<CarteiraEntity>()
             {

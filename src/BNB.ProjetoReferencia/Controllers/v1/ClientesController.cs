@@ -1,5 +1,9 @@
-﻿using BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
+﻿using BNB.ProjetoReferencia.Core.Common.Interfaces;
+using BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
+using BNB.ProjetoReferencia.Core.Domain.Cliente.Events;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
+using BNB.ProjetoReferencia.Extensions;
+using BNB.ProjetoReferencia.Inputs;
 using BNB.ProjetoReferencia.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,5 +40,27 @@ public class ClientesController : ControllerBase
     }
 
     private ClienteModel CriarModelo(ClienteEntity entidade) => new(this, entidade);
+
+    /// <summary>
+    /// Atualizar os dados do Investidor
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="atualizarClienteEventHandler"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ClienteModel>> Post(
+        [FromBody] AtualizarClienteInput input,
+        [FromServices] IRequestHandler<DomainEvent<AtualizarClienteEvent>, ClienteEntity> atualizarClienteEventHandler,
+        CancellationToken cancellationToken)
+    {
+        var evento = this.CriarEventoDominio<AtualizarClienteEvent>(input);
+        var cliente = await atualizarClienteEventHandler.Handle(evento, cancellationToken);
+        return Ok(CriarModelo(cliente));
+    }
+    
 
 }

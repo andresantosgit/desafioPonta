@@ -1,9 +1,11 @@
 using BNB.ProjetoReferencia.Core.Common.Extensions;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.HostedServices;
+using BNB.ProjetoReferencia.Core.Domain.Webhook.HostedServices;
 using BNB.ProjetoReferencia.Filters;
 using BNB.ProjetoReferencia.Infrastructure.Common.Extensions;
 using BNB.ProjetoReferencia.Infrastructure.Database;
 using BNB.ProjetoReferencia.Infrastructure.Https;
+using BNB.S095.BNBAuth.Middleware;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Internal;
@@ -37,7 +39,7 @@ builder.Services.AddSwaggerGen(c =>
     //    Type = SecuritySchemeType.ApiKey,
     //    Scheme = "Bearer"
     //});
-    //
+
     //c.AddSecurityRequirement(new OpenApiSecurityRequirement
     //{
     //    {
@@ -53,6 +55,8 @@ builder.Services.AddSwaggerGen(c =>
     //    }
     //});
 });
+
+//builder.Services.AddBNBAuthBearer();
 
 // É usada para adicionar um filtro global ao pipeline do MVC em uma aplicação ASP.NET Core.
 // Esse filtro será aplicado a todas as ações de todos os controladores, proporcionando uma
@@ -85,6 +89,9 @@ builder.Services.AddCore();
 // Adiciona o hosted service da carteira para validação de manifestações expiradas
 builder.Services.AddHostedService<CarteiraHostedService>();
 
+// Adiciona o hosted service do webhook para cadastro da url
+builder.Services.AddHostedService<WebhookHostedService>();
+
 // .AddHttpContextAccessor() é usado em aplicações ASP.NET Core para adicionar o serviço
 // IHttpContextAccessor ao contêiner de injeção de dependência.
 builder.Services.AddHttpContextAccessor();
@@ -101,7 +108,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+//app.UseBNBAuthBearer();
+
+//app.UseAuthorization();
 
 app.MapControllers();
 

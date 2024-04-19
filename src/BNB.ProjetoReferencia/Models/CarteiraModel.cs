@@ -26,6 +26,7 @@ public class CarteiraModel
         ValorUnitarioPorAcao = entity.ValorUnitarioPorAcao;
         ValorTotal = entity.ValorTotal;
         Status = entity.Status;
+        PixCopiaECola = entity.PixCopiaECola;
 
         // Adiciona links HATEOAS ao modelo
         Links["self"] = ctrl.Link<CarteirasController>(
@@ -60,6 +61,11 @@ public class CarteiraModel
     /// TxId para identificação pagamento PIX
     /// </summary>
     public string TxId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// PixCopiaECola para pagamento PIX
+    /// </summary>
+    public string PixCopiaECola { get; set; } = string.Empty;
 
     /// <summary>
     /// Data de criação do manifesto

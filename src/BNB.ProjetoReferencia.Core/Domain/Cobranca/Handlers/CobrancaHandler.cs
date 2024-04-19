@@ -8,21 +8,17 @@ using BNB.ProjetoReferencia.Core.Domain.Cobranca.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BNB.ProjetoReferencia.Core.Domain.Carteira.Handlers;
+namespace BNB.ProjetoReferencia.Core.Domain.Cobranca.Handlers;
 
 [Service(ServiceLifetime.Scoped,
     typeof(IRequestHandler<DomainEvent<CriarCarteiraEvent>, CarteiraEntity>),
     typeof(IRequestHandler<DomainEvent<CancelarCarteiraEvent>, CarteiraEntity>),
-    typeof(IRequestHandler<DomainEvent<ExpirarCarteiraEvent>, CarteiraEntity>),
-    typeof(IRequestHandler<DomainEvent<CallbackEvent>>),
-    typeof(IRequestHandler<DomainEvent<AtualizarCarteiraEvent>, CarteiraEntity>)
+    typeof(IRequestHandler<DomainEvent<ExpirarCarteiraEvent>, CarteiraEntity>)
     )]
-public class CarteiraHandler :
+public class CobrancaHandler :
     IRequestHandler<DomainEvent<CriarCarteiraEvent>, CarteiraEntity>,
     IRequestHandler<DomainEvent<CancelarCarteiraEvent>, CarteiraEntity>,
-    IRequestHandler<DomainEvent<ExpirarCarteiraEvent>, CarteiraEntity>,
-    IRequestHandler<DomainEvent<CallbackEvent>>,
-    IRequestHandler<DomainEvent<AtualizarCarteiraEvent>, CarteiraEntity>
+    IRequestHandler<DomainEvent<ExpirarCarteiraEvent>, CarteiraEntity>
 {
     private readonly ICarteiraRepository _carteiraRepository;
     private readonly IClienteRepository _clienteRepository;
@@ -30,15 +26,13 @@ public class CarteiraHandler :
     private readonly IRules<CriarCarteiraEvent> _criarCarteiraEventRules;
     private readonly IRules<CancelarCarteiraEvent> _excluirCarteiraEventRules;
     private readonly IRules<ExpirarCarteiraEvent> _expirarCarteiraEventRules;
-    private readonly IRules<AtualizarCarteiraEvent> _atualizarCarteiraEventRules;
 
-    public CarteiraHandler(ICarteiraRepository carteiraRepository,
+    public CobrancaHandler(ICarteiraRepository carteiraRepository,
                            IClienteRepository clienteRepository,
                            ICobrancaRepository cobrancaRepository, 
                            IRules<CriarCarteiraEvent> criarCarteiraEventRules,
                            IRules<CancelarCarteiraEvent> excluirCarteiraEventRules,
-                           IRules<ExpirarCarteiraEvent> expirarCarteiraEventRules,
-                           IRules<AtualizarCarteiraEvent> atualizarCarteiraEventRules)
+                           IRules<ExpirarCarteiraEvent> expirarCarteiraEventRules)
     {
         _criarCarteiraEventRules = criarCarteiraEventRules;
         _excluirCarteiraEventRules = excluirCarteiraEventRules;
@@ -46,7 +40,6 @@ public class CarteiraHandler :
         _clienteRepository = clienteRepository;
         _expirarCarteiraEventRules = expirarCarteiraEventRules;
         _cobrancaRepository = cobrancaRepository;
-        _atualizarCarteiraEventRules = atualizarCarteiraEventRules;
     }
 
     public async Task<CarteiraEntity> Handle(DomainEvent<CriarCarteiraEvent> @event, CancellationToken cancellationToken)
@@ -90,11 +83,10 @@ public class CarteiraHandler :
 
         var retornoCobranca = await _cobrancaRepository.Add(cobranca, cancellationToken);
 
-        if(retornoCobranca != null && retornoCobranca.TxId != null && retornoCobranca.Status != null && retornoCobranca.PixCopiaECola != null)
+        if(retornoCobranca.TxId != null)
         {
             carteira.TxId = retornoCobranca.TxId;
-            carteira.Status = retornoCobranca.Status;            
-            carteira.PixCopiaECola = retornoCobranca.PixCopiaECola; 
+            carteira.Status = retornoCobranca.Status;
             var novaCarteira = await _carteiraRepository.AddAsync(carteira, cancellationToken);
             await _carteiraRepository.SaveAsync(cancellationToken);
 
@@ -138,37 +130,4 @@ public class CarteiraHandler :
 
     }
 
-    public async Task Handle(DomainEvent<CallbackEvent> @event, CancellationToken cancellationToken)
-    {
-        foreach (PixEntity pix in @event.Model.listPix)
-        {           
-            var cobranca = await _cobrancaRepository.GetByTxId(pix.txid, cancellationToken);
-            var carteira = await _carteiraRepository.FindByTxIdAsync(pix.txid, cancellationToken);            
-
-            if(cobranca != null && carteira != null && cobranca!.Status != null)
-            {
-                carteira!.Status = cobranca!.Status;
-                carteira!.DataAtualizacao = DateTime.Now;
-                _carteiraRepository.Update(carteira);
-                await _carteiraRepository.SaveAsync(cancellationToken);                
-            }            
-        }        
-
-    }
-
-    public async Task<CarteiraEntity> Handle(DomainEvent<AtualizarCarteiraEvent> @event, CancellationToken cancellationToken)
-    {
-        (await _atualizarCarteiraEventRules.FactoryAsync(@event.Model, cancellationToken)).Validate();
-
-        var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(@event.Model.IdInvestidor, cancellationToken);
-        var carteira = carteiras.FirstOrDefault(x => x.Id == @event.Model.Id);
-
-        carteira!.Status = @event.Model.Status;
-
-        var carteiraAtualizada = _carteiraRepository.Update(carteira);
-        await _carteiraRepository.SaveAsync(cancellationToken);
-
-        return carteiraAtualizada;
-
-    }
 }

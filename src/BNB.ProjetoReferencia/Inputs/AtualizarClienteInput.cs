@@ -1,4 +1,4 @@
-﻿using BNB.ProjetoReferencia.Core.Domain.Carteira.Events;
+﻿using BNB.ProjetoReferencia.Core.Domain.Cliente.Events;
 using System.ComponentModel.DataAnnotations;
 
 namespace BNB.ProjetoReferencia.Inputs;
@@ -6,18 +6,27 @@ namespace BNB.ProjetoReferencia.Inputs;
 /// <summary>
 /// Modelo de entrada para criar uma manifestação de compra de ações.
 /// </summary>
-public record CriarCarteiraInput(
+public record AtualizarClienteInput(
     /// <summary>
     /// Id do investidor, é usado CPF ou CPNJ
     /// </summary>
     [Required(ErrorMessage = "O CPF/CNPJ é obrigatório.")]
     string IdInvestidor,
-    
+
     /// <summary>
-    /// Quantidade que o investidor deseja integralizar
-    /// </summary>
-    [Range(0, ulong.MaxValue, ErrorMessage = "A quantidade deve ser acima de 0.")]
-    int QuantidadeIntegralizada,
+    /// Endereço do Investidor
+    /// </summary>    
+    string EnderecoInvestidor,
+
+    /// <summary>
+    /// Telefone do Investidor
+    /// </summary>    
+    string TelefoneInvestidor,
+
+    /// <summary>
+    /// Email do Investidor
+    /// </summary>    
+    string EmailInvestidor,
 
     /// <summary>
     /// Matricula de quem solciita a atualização
@@ -31,6 +40,6 @@ public record CriarCarteiraInput(
     /// converte implicitamente um objeto de entrada em um evento de domínio.
     /// </summary>
     /// <param name="instance"></param>
-    public static implicit operator CriarCarteiraEvent(CriarCarteiraInput instance)
-        => new(instance.IdInvestidor, instance.QuantidadeIntegralizada, instance.Matricula);
+    public static implicit operator AtualizarClienteEvent(AtualizarClienteInput instance)
+        => new(instance.IdInvestidor, instance.EnderecoInvestidor, instance.TelefoneInvestidor, instance.EmailInvestidor, instance.Matricula);
 }
