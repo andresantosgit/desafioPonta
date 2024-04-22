@@ -1,5 +1,6 @@
 ﻿using BNB.ProjetoReferencia.Controllers.v1;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Entities;
+using BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 using BNB.ProjetoReferencia.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,27 +15,30 @@ public class CarteiraModel
     /// Construtor padrão
     /// </summary>
     /// <param name="ctrl"></param>
-    /// <param name="entity"></param>
-    public CarteiraModel(ControllerBase ctrl, CarteiraEntity entity)
+    /// <param name="carteira"></param>
+    /// <param name="cliente"></param>
+    public CarteiraModel(ControllerBase ctrl, CarteiraEntity carteira, ClienteEntity? cliente = null)
     {
-        Id = entity.Id;
-        IdInvestidor = entity.IdInvestidor;
-        TxId = entity.TxId;
-        DataCriacao = entity.DataCriacao;
-        DataAtualizacao = entity.DataAtualizacao;
-        QuantidadeIntegralizada = entity.QuantidadeIntegralizada;
-        ValorUnitarioPorAcao = entity.ValorUnitarioPorAcao;
-        ValorTotal = entity.ValorTotal;
-        Status = entity.Status;
-        PixCopiaECola = entity.PixCopiaECola;
+        Id = carteira.Id;
+        IdInvestidor = carteira.IdInvestidor;
+        NomeAcionista = cliente?.NomeAcionista ?? string.Empty;
+        TipoPessoa = cliente?.TipoPessoa ?? string.Empty;
+        TxId = carteira.TxId;
+        DataCriacao = carteira.DataCriacao;
+        DataAtualizacao = carteira.DataAtualizacao;
+        QuantidadeIntegralizada = carteira.QuantidadeIntegralizada;
+        ValorUnitarioPorAcao = carteira.ValorUnitarioPorAcao;
+        ValorTotal = carteira.ValorTotal;
+        Status = carteira.Status;
+        PixCopiaECola = carteira.PixCopiaECola;
 
         // Adiciona links HATEOAS ao modelo
         Links["self"] = ctrl.Link<CarteirasController>(
-          nameof(CarteirasController.Get), routeValues: new { idInvestidor = entity.IdInvestidor }
+          nameof(CarteirasController.Get), routeValues: new { idInvestidor = carteira.IdInvestidor }
         );
 
         Links["delete"] = ctrl.Link<CarteirasController>(
-          nameof(CarteirasController.Delete), routeValues: new { id = entity.Id, idInvestidor = entity.IdInvestidor }
+          nameof(CarteirasController.Delete), routeValues: new { id = carteira.Id, idInvestidor = carteira.IdInvestidor }
         ); ;
 
 
@@ -56,6 +60,16 @@ public class CarteiraModel
     /// Id do investidor que efetuou o manifesto
     /// </summary>
     public string IdInvestidor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Nome
+    /// </summary>
+    public string NomeAcionista { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Tipo Pessoa
+    /// </summary>
+    public string TipoPessoa { get; set; } = string.Empty;
 
     /// <summary>
     /// TxId para identificação pagamento PIX

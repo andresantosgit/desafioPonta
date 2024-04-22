@@ -2,6 +2,7 @@
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Events;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Interfaces;
+using BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
 using BNB.ProjetoReferencia.Extensions;
 using BNB.ProjetoReferencia.Inputs;
@@ -22,6 +23,7 @@ public class CarteirasController : ControllerBase
     /// Obtem todas as carteiras de todos investidores
     /// </summary>
     /// <param name="carteiraRepository"></param>
+    /// <param name="clienteRepository"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
@@ -31,13 +33,20 @@ public class CarteirasController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorModel))]
     public async Task<ActionResult> Get(
         [FromServices] ICarteiraRepository carteiraRepository,
+        [FromServices] IClienteRepository clienteRepository,
         CancellationToken cancellationToken)
     {
         var carteiras = await carteiraRepository.FindAllAsync(cancellationToken);
         if (!carteiras.Any())
             return NoContent();
 
-        return Ok(carteiras.Select(x => CriarModelo(x)).ToList());
+        var clientesIdsInvestidor = carteiras
+            .Select(x => x.IdInvestidor)
+            .Distinct()
+            .Select(x => clienteRepository.FindByIdInvestidorAsync(x, cancellationToken).Result)
+            .ToArray();
+        
+        return Ok(carteiras.Select(x => CriarModelo(x, clientesIdsInvestidor.FirstOrDefault(y => y.IdInvestidor == x.IdInvestidor))).ToList());
     }
 
     /// <summary>
@@ -76,7 +85,7 @@ public class CarteirasController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorModel))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorModel))]
     public async Task<ActionResult> Get(
-        [FromRoute] int idCarteira,        
+        [FromRoute] int idCarteira,
         [FromServices] ICarteiraRepository carteiraRepository,
         CancellationToken cancellationToken)
     {
@@ -85,7 +94,7 @@ public class CarteirasController : ControllerBase
             return NoContent();
 
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
-        QRCodeData qrCodeData = qrGenerator.CreateQrCode(carteira.PixCopiaECola, QRCodeGenerator.ECCLevel.Q);        
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode(carteira.PixCopiaECola, QRCodeGenerator.ECCLevel.Q);
         BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
         string qrCodeBase64 = Convert.ToBase64String(qrCode.GetGraphic(10));
 
@@ -198,5 +207,5 @@ public class CarteirasController : ControllerBase
         //return fileContentResult;
     }
 
-    private CarteiraModel CriarModelo(CarteiraEntity entidade) => new(this, entidade);
+    private CarteiraModel CriarModelo(CarteiraEntity carteira, ClienteEntity? cliente = null) => new(this, carteira, cliente);
 }

@@ -1,4 +1,5 @@
 ﻿using BNB.ProjetoReferencia.Core.Common.Interfaces;
+using BNB.ProjetoReferencia.Core.Domain.Carteira.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Events;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
@@ -18,9 +19,12 @@ public class ClientesController : ControllerBase
 {
     /// <summary>
     /// Obtem as informaçãoes do cliente
+    /// 
     /// </summary>
     /// <param name="idInvestidor"></param>
     /// <param name="clienteRepository"></param>
+    /// <param name="carteiraRepository"></param>
+    /// <param name="configuration"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("{idInvestidor}")]
@@ -30,12 +34,21 @@ public class ClientesController : ControllerBase
     public async Task<ActionResult<ClienteModel>> Get(
         [FromRoute] string idInvestidor,
         [FromServices] IClienteRepository clienteRepository,
+        [FromServices] ICarteiraRepository carteiraRepository,
+        [FromServices] IConfiguration configuration,
         CancellationToken cancellationToken)
     {
         idInvestidor = Uri.UnescapeDataString(idInvestidor);
         var cliente = await clienteRepository.FindByIdInvestidorAsync(idInvestidor, cancellationToken);
         if (cliente is null)
             return NoContent();
+
+        var carteiras = await carteiraRepository.FindAllByIdInvestidorAsync(idInvestidor, cancellationToken);
+        var statusSaldo = configuration["StatusSaldo"]!;
+        var quantidadeAtual = carteiras.Where(x => statusSaldo.Split(";").Contains(x.Status)).Sum(y => y.QuantidadeIntegralizada);
+
+        cliente.DireitoSubscricao -= quantidadeAtual;
+
         return Ok(CriarModelo(cliente));
     }
 
