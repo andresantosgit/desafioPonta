@@ -1,8 +1,17 @@
 ﻿
-$(function () {
+$(document).ready(function () {
+
+    var cpfCnpj = $('#CPFOuCNPJ').val();
+    if (cpfCnpj) {
+        ConsultarManifestos(cpfCnpj);
+    }
+
     $('#btn-consultar').on('click', function (e) {
         e.preventDefault();
-        ConsultarDados();
+        var cpfCnpj = $('#CPFOuCNPJ').val();
+
+        ConsultarDados(cpfCnpj);
+        ConsultarManifestos(cpfCnpj);
     });
 
     $('#Quantidade').on('change', function (e) {
@@ -11,10 +20,7 @@ $(function () {
     });
 });
 
-function ConsultarDados() {
-    
-    var cpfCnpj = $('#CPFOuCNPJ').val();
-
+function ConsultarDados(cpfCnpj) {
     if (cpfCnpj) {
         $('.ui.modal')
             .modal({
@@ -51,8 +57,8 @@ function ConsultarDados() {
         });
     }    
 }
-function PreencheCampos(lstRetorno) {
 
+function PreencheCampos(lstRetorno) {
     $('#field_NomeInvestidor').removeClass("disabled");
     $('#field_quantidade').removeClass("disabled");
     $('#field_telefone').removeClass("disabled");
@@ -69,16 +75,18 @@ function PreencheCampos(lstRetorno) {
     valorAcao = mmoeda(String(valorAcao));
     $('#ValorAcao').val(valorAcao);
 
-    AtualizaValorTotal();
 
     AtualizaSelect("TipoPessoa", lstRetorno.TipoPessoa);
     AtualizaSelect("TipoCustodia", lstRetorno.TipoCustodia);
 
     $('#CPFOuCNPJ').val(lstRetorno.CPFOuCNPJ);
-    $('#NomeInvestidor').val(lstRetorno.NomeAcionista);
+    $('#NomeInvestidor').val(lstRetorno.NomeInvestidor);
     $('#Telefone').val(lstRetorno.Telefone);
     $('#Endereco').val(lstRetorno.Endereco);
     $('#Email').val(lstRetorno.Email);
+    $('#Quantidade').val(lstRetorno.Quantidade);
+
+    AtualizaValorTotal();
 
     $('#field_NomeInvestidor').addClass("disabled");
     $('#NomeInvestidor').prop("disabled", false);
@@ -90,6 +98,7 @@ function AtualizaSelect(id, value) {
     var desc = $("#" + id + " option[value='" + value + "']").text();
     $("#field_" + id + " label.ui-dropdown-label").text(desc);
 }
+
 function limparCampos() {
     $('#CPFOuCNPJ').val("");
     $('#TipoPessoa').val("");

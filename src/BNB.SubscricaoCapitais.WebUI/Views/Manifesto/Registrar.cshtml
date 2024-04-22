@@ -181,19 +181,36 @@
 							</div>
                         }
                     </div>
+                    <div class="content">
+                        <div class="field">
+                            <div class="field right floated" id="global-filter-demanda" name="global-filter-demanda" hidden>
+                                <div class="ui icon input">
+                                    <i class="search icon"></i>
+                                    <input type="text" id="globalFilterConsultarDemanda" onkeyup="javascript:forceLower(this);" placeholder="Digite para filtrar" size="50">
+                                </div>
+                            </div>
+                            <div id="listaManifestos"></div>
+                            <div class="field right floated elevated volume-demanda" id="volume-demanda" name="volume-demanda">
+                                <a class="ui button icon labeled bgm-orange-bnb" id="btnDownload" href="#" onclick="javascript:ExportarDados();"><i class="download icon"></i>Exportar Excel</a>
+                                <span class="ui larger" name="volumeManifestos" id="volumeManifestos"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+<div class="ui content">
+    
+</div>
 
 @section Scripts {
 
     <script src="~/Scripts/mascaras.js"></script>
     <script src="~/Scripts/Layout/closeEventMessages.js"></script>
-    <script src="~/Scripts/Manifesto/ConsultaDados.js"></script>
-
+    <script src="~/Scripts/Manifesto/Consultar.js"></script>
+    <script src="~/Scripts/Manifesto/Registrar.js"></script>
     <script>
         var info;
     </script>

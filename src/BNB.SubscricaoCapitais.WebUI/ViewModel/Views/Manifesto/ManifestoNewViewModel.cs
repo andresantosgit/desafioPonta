@@ -9,6 +9,7 @@
 
 
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto
 {
@@ -17,6 +18,8 @@ namespace BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto
     /// </summary>
     public class ManifestoNewViewModel
     {
+        public int? Id { get; set; }
+
         /// <summary>
         /// CPF ou CNPJ
         /// </summary>
@@ -95,6 +98,7 @@ namespace BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto
         [DataType(DataType.Currency)]
         [Display(Name = "Valor da ação")]
         [Required(ErrorMessage = "O campo 'Valor da ação' é obrigatório.")]
+        [DisplayFormat(DataFormatString = "{0:c}")]
         public decimal ValorAcao { get; set; }
 
 
@@ -105,6 +109,7 @@ namespace BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto
         [DataType(DataType.Currency)]
         [Display(Name = "Valor total")]
         [Required(ErrorMessage = "O campo 'Valor total' é obrigatório.")]
+        [DisplayFormat(DataFormatString = "{0:c}")]
         public decimal ValorTotal { get; set; }
 
         /// <summary>
@@ -114,5 +119,51 @@ namespace BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto
         [Display(Name = "Solicitante")]
         [Required(ErrorMessage = "O campo 'Solicitante' é obrigatório.")]
         public string? MatriculaSolicitante { get; set; }
+
+        public string? Status { get; set; }
+
+        public DateTime? DataCriacao { get; set; }
+
+        public DateTime? DataAtualizacao { get; set; }
+
+        public string TipoPessoaText
+        {
+            get
+            {
+                return (this.TipoPessoa.HasValue && this.TipoPessoa == 2) ? "Jurídica" : "Física";
+            }
+        }
+
+        public string DataCriacaoText
+        {
+            get
+            {
+                return this.DataCriacao.HasValue ? this.DataCriacao.Value.ToString("dd/MM/yyyy") : string.Empty;
+            }
+        }
+
+        public string DataAtualizacaoText
+        {
+            get
+            {
+                return this.DataAtualizacao.HasValue ? this.DataAtualizacao.Value.ToString("dd/MM/yyyy") : string.Empty;
+            }
+        }
+
+        public string ValorAcaoText
+        {
+            get
+            {
+                return string.Format(CultureInfo.GetCultureInfo("pt-BR"), "{0:C}", this.ValorAcao);
+            }
+        }
+
+        public string ValorTotalText
+        {
+            get
+            {
+                return string.Format(CultureInfo.GetCultureInfo("pt-BR"), "{0:C}", this.ValorTotal);
+            }
+        }
     }
 }
