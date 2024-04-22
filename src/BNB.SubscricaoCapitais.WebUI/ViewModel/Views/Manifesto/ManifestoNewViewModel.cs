@@ -82,7 +82,6 @@ namespace BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto
         [Required(ErrorMessage = "O campo 'Telefone' é obrigatório.")]
         public string? Telefone { get; set; }
 
-
         /// <summary>
         /// Quantidade
         /// </summary>
@@ -90,6 +89,13 @@ namespace BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto
         [Display(Name = "Quantidade")]
         [Required(ErrorMessage = "O campo 'Quantidade' é obrigatório.")]
         public int? Quantidade { get; set; }
+
+        /// <summary>
+        /// Quantidade máxima
+        /// </summary>
+        /// <value>O parâmetro não é usado</value>
+        [Display(Name = "Quantidade máxima")]
+        public int? QuantidadeMaxima { get; set; }
 
         /// <summary>
         /// Valor da ação
