@@ -4,6 +4,7 @@ using BNB.ProjetoReferencia.Core.Common.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
 using BNB.ProjetoReferencia.Infrastructure.Http.Configuration;
+using BNB.S095.BNBAuth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Json;
@@ -46,7 +47,9 @@ public class CobrancaRepository
             WriteIndented = true
         };
 
-        var content = JsonSerializer.Serialize(entity, serializeOptions);        
+        var content = JsonSerializer.Serialize(entity, serializeOptions);
+
+        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ContextoSeguranca.GetCredencialAplicacao().Token);
 
         using var response = await _httpClient.PostAsync(uri, new StringContent(content), ctx);
         if (!response.IsSuccessStatusCode) return default;
@@ -58,6 +61,9 @@ public class CobrancaRepository
     public async Task<bool> AnyById(string id, CancellationToken ctx)
     {
         var uri = GetUriById(id);
+        
+        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ContextoSeguranca.GetCredencialAplicacao().Token);
+
         using var response = await _httpClient.GetAsync(uri, ctx);
         if (!response.IsSuccessStatusCode) return default;
         return await response.Content.ReadFromJsonAsync<CobrancaModel>(cancellationToken: ctx) is not null;
@@ -66,6 +72,9 @@ public class CobrancaRepository
     public async Task<CobrancaEntity> GetByTxId(string txId, CancellationToken ctx)
     {
         var uri = GetUriById(txId);
+
+        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ContextoSeguranca.GetCredencialAplicacao().Token);
+
         using var response = await _httpClient.GetAsync(uri, ctx);
         if (!response.IsSuccessStatusCode) return default;
         var model = await response.Content.ReadFromJsonAsync<CobrancaModel>(cancellationToken: ctx);
