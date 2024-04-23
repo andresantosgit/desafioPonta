@@ -157,7 +157,7 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
         }
 
         public async Task<ActionResult> ListaManifestos(string cpfCnpj, CancellationToken cancellationToken)
-        {            
+        {
             var list = new List<ManifestoNewViewModel>();
 
             cpfCnpj = Uri.UnescapeDataString(cpfCnpj);
@@ -195,7 +195,7 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             }
 
             JsonResult lobjJson = this.Json(list);
-            return lobjJson;            
+            return lobjJson;
         }
 
         /// <summary>
