@@ -5,6 +5,13 @@ using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
 using BNB.S095.BNBAuth.Middleware;
 using System.ComponentModel.DataAnnotations;
 using BNB.ProjetoReferencia.WebUI.Configuration;
+using BNB.ProjetoReferencia.Infrastructure.Common.Extensions;
+using BNB.ProjetoReferencia.Core.Common.Extensions;
+using BNB.ProjetoReferencia.Infrastructure.Https;
+using BNB.ProjetoReferencia.Infrastructure.Database;
+using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
+using BNB.ProjetoReferencia.Infrastructure.Http.MessageHandler;
+using BNB.ProjetoReferencia.Infrastructure.Http.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +32,20 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<SegurancaAutorizaActionFilter>();
 //builder.Services.AddScoped<ExceptionActionFilter>();
 builder.Services.AddScoped<Validate>();
+
+builder.Services.AddHttpClient<ICobrancaRepository, CobrancaRepository>().AddHttpMessageHandler<HttpMessageClientHandler>();
+
+// Configura a Database
+builder.Services.ConfigureDatabase(builder.Configuration);
+
+// Configura o Http
+builder.Services.ConfigureHttp(builder.Configuration);
+
+// Configura os serviços da infraestrutura
+builder.Services.AddInfrastructure();
+
+// Adiciona os serviços do Core
+builder.Services.AddCore();
 
 var app = builder.Build();
 

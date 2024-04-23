@@ -1,62 +1,70 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IdentityModel.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
 
 namespace BNB.ProjetoReferencia.Infrastructure.Http.MessageHandler;
 
-public class HttpMessageHandler : DelegatingHandler
+public class HttpMessageClientHandler : DelegatingHandler
 {
-    //private readonly IConfiguration Configuration;    
-    //private readonly HttpClient client;
-    //private string token;
-    //public HttpMessageHandler(HttpClient httpClient, IConfiguration configuration)
-    //{
-    //    Configuration = configuration;            
-    //    client = httpClient;
-    //}
+    private readonly IConfiguration Configuration;
+    private readonly TokenProvider Tokens;    
+    private readonly HttpClient client;
 
-    //public async Task<bool> CheckTokens()
-    //{
-    //    var uri = GetUriById(id);
-    //    using var response = await _httpClient.GetAsync("https://sso.dreads.bnb/auth/realms/Desenv/protocol/openid-connect/token");
-    //    var response = await client.GetAsync();
-    //    if (disco.IsError) throw new Exception(disco.Error);
+    public HttpMessageClientHandler(HttpClient httpClient, IConfiguration configuration, TokenProvider tokens)
+    {
+        Configuration = configuration;
+        Tokens = tokens;        
+        client = httpClient;
+    }
 
-    //    var result = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-    //    {
-    //        Address = disco.TokenEndpoint,
-    //        ClientId = Configuration["Settings:ClientID"],
-    //        ClientSecret = Configuration["Settings:ClientSecret"]
-    //    });
+    public async Task<bool> CheckTokens()
+    {
+        //var disco = await client.GetDiscoveryDocumentAsync(Configuration["Settings:Authority"]);
+        //if (disco.IsError) throw new Exception(disco.Error);
 
-    //    if (result.IsError)
-    //    {
-    //        //Log("Error: " + result.Error);
-    //        return false;
-    //    }
+        var result = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+        {
+            Address = "https://sso.dreads.bnb/auth/",
+            ClientId = "s493-backend-subscricao-servico",
+            ClientSecret = "17d81ec8-e281-47fc-8e47-687def20af82"
+        });
 
-    //    Tokens.AccessToken = result.AccessToken;
-    //    Tokens.RefreshToken = result.RefreshToken;
+        if (result.IsError)
+        {
+            //Log("Error: " + result.Error);
+            return false;
+        }
 
-    //    return true;
-    //}
+        Tokens.AccessToken = result.AccessToken;
+        Tokens.RefreshToken = result.RefreshToken;
 
-    //protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-    //{
-    //    request.SetBearerToken(Tokens.AccessToken);
+        return true;
+    }
 
-    //    var response = await base.SendAsync(request, cancellationToken);
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        request.SetBearerToken(Tokens.AccessToken);
 
-    //    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-    //    {
-    //        if (await CheckTokens())
-    //        {
-    //            request.SetBearerToken(Tokens.AccessToken);
+        var response = await base.SendAsync(request, cancellationToken);
 
-    //            response = await base.SendAsync(request, cancellationToken);
-    //        }
-    //    }
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            if (await CheckTokens())
+            {
+                request.SetBearerToken(Tokens.AccessToken);
 
-    //    return response;
-    //}
+                response = await base.SendAsync(request, cancellationToken);
+            }
+        }
+
+        return response;
+    }    
+
+}
+
+public class TokenProvider
+{
+    public string AccessToken { get; set; }
+    public string RefreshToken { get; set; }
 }

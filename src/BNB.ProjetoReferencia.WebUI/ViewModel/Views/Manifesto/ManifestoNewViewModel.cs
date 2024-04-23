@@ -114,5 +114,52 @@ namespace BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto
         [Display(Name = "Solicitante")]
         [Required(ErrorMessage = "O campo 'Solicitante' é obrigatório.")]
         public string? MatriculaSolicitante { get; set; }
+
+        public string? Status { get; set; }
+        public string? PixCopiaECola { get; set; }
+
+        public DateTimeOffset? DataCriacao { get; set; }
+
+        public DateTimeOffset? DataAtualizacao { get; set; }
+
+        public string TipoPessoaText
+        {
+            get
+            {
+                return (this.TipoPessoa.HasValue && this.TipoPessoa == 2) ? "Jurídica" : "Física";
+            }
+        }
+
+        public string DataCriacaoText
+        {
+            get
+            {
+                return this.DataCriacao.HasValue ? this.DataCriacao.Value.ToString("dd/MM/yyyy") : string.Empty;
+            }
+        }
+
+        public string DataAtualizacaoText
+        {
+            get
+            {
+                return this.DataAtualizacao.HasValue ? this.DataAtualizacao.Value.ToString("dd/MM/yyyy") : string.Empty;
+            }
+        }
+
+        public string ValorAcaoText
+        {
+            get
+            {
+                return string.Format(CultureInfo.GetCultureInfo("pt-BR"), "{0:C}", this.ValorAcao);
+            }
+        }
+
+        public string ValorTotalText
+        {
+            get
+            {
+                return string.Format(CultureInfo.GetCultureInfo("pt-BR"), "{0:C}", this.ValorTotal);
+            }
+        }
     }
 }
