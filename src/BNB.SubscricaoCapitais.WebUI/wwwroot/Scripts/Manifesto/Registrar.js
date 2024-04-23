@@ -61,12 +61,14 @@ function ConsultarDados(cpfCnpj) {
 function PreencheCampos(lstRetorno) {
     $('#field_NomeInvestidor').removeClass("disabled");
     $('#field_quantidade').removeClass("disabled");
+    $('#field_QuantidadeMaxima').removeClass("disabled");
     $('#field_telefone').removeClass("disabled");
     $('#field_endereco').removeClass("disabled");
     $('#field_email').removeClass("disabled");
 
     $('#NomeInvestidor').prop("disabled", false);
     $('#Quantidade').prop("disabled", false);
+    $('#QuantidadeMaxima').prop("disabled", false);
     $('#Telefone').prop("disabled", false);
     $('#Endereco').prop("disabled", false);
     $('#Email').prop("disabled", false);
@@ -84,12 +86,17 @@ function PreencheCampos(lstRetorno) {
     $('#Telefone').val(lstRetorno.Telefone);
     $('#Endereco').val(lstRetorno.Endereco);
     $('#Email').val(lstRetorno.Email);
-    $('#Quantidade').val(lstRetorno.Quantidade);
+    $('#Quantidade').val(lstRetorno.QuantidadeMaxima);
+    $('#QuantidadeMaxima').val(lstRetorno.QuantidadeMaxima);
+    $('#Quantidade').prop("max", lstRetorno.QuantidadeMaxima);
 
     AtualizaValorTotal();
 
     $('#field_NomeInvestidor').addClass("disabled");
     $('#NomeInvestidor').prop("disabled", false);
+
+    $('#field_QuantidadeMaxima').addClass("disabled");
+    $('#QuantidadeMaxima').prop("disabled", false);
 }
 
 function AtualizaSelect(id, value) {

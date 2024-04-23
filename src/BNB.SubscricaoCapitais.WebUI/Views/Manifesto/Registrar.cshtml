@@ -47,6 +47,16 @@
                         {
                             Html.RenderPartial("_ErrosDeValidacao", (IEnumerable<ErroValidacao>)ViewBag.Erros);
                         }
+                        @if (ViewBag.TempError != null)
+                        {
+                            <div class="field">
+                                <div id="message" class="ui negative message">
+                                    <i class="close icon"></i>
+                                    <p id="messageContent">@ViewBag.TempError</p>
+                                </div>
+                                <br />
+                            </div>
+                        }
                         @if (ViewBag.Pendencias != null)
                         {
                             @* Html.Partial("_ErrosDeValidacao", (IEnumerable<ErroValidacao>)ViewBag.Pendencias); *@
@@ -64,10 +74,15 @@
                                 </ul>
                             </div>
                         </div>
-
+                        <div class="field">
+                            <div id="message" class="ui @(ViewBag.SucessoInsercao != null ? "visible" : "hidden") @(ViewBag.SucessoInsercao  != null && ViewBag.SucessoInsercao ? "positive" : "negative") message">
+                                <i class="close icon"></i>
+                                <p id="messageContent">@(ViewBag.SucessoInsercao != null && ViewBag.SucessoInsercao ? "Operação realizada com sucesso" : "Não foi possível realizar a operação")</p>
+                            </div>
+                        </div>
                         @using (Html.BeginForm())
                         {
-                            <div class="ui form">
+                            <div class="ui form paddingTop8">
                                 @Html.AntiForgeryToken()
                                 <div class="fields">
                                     <div class="field three wide required">
@@ -85,63 +100,73 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="fields">
-                                    <div class="field three wide required disabled" id="field_TipoPessoa">
-                                        @Html.LabelFor(model => model.TipoPessoa)
-                                        @Html.DropDownListFor(model => model.TipoPessoa, new SelectList(listaTipoPessoa, "Codigo", "Descricao"), new { @class = "control-dropdown", @tabindex = "2" })
+                                <div class="ui segment">
+                                    <div class="ui clearing segment basic clearing no-padding">
+                                        <h4 class="ui dividing header bdr-orange left"> Dados do Cliente </h4>
                                     </div>
-                                    <div class="field ten wide required disabled" id="field_NomeInvestidor">
-                                        @Html.LabelFor(model => model.NomeInvestidor, htmlAttributes: new { @class = "control-label" })
-                                        @Html.TextBoxFor(model => model.NomeInvestidor, new
-                                            {
-                                                @class = "control-input",
-                                                @tabindex = "3",
-                                                @disabled = "disabled"
-                                            })
+                                    <div class="fields">
+                                        <div class="field two wide required disabled" id="field_TipoPessoa">
+                                            @Html.LabelFor(model => model.TipoPessoa)
+                                            @Html.DropDownListFor(model => model.TipoPessoa, new SelectList(listaTipoPessoa, "Codigo", "Descricao"), new { @class = "control-dropdown", @tabindex = "2" })
+                                        </div>
+                                        <div class="field eight wide required disabled" id="field_NomeInvestidor">
+                                            @Html.LabelFor(model => model.NomeInvestidor, htmlAttributes: new { @class = "control-label" })
+                                            @Html.TextBoxFor(model => model.NomeInvestidor, new
+                                                {
+                                                    @class = "control-input",
+                                                    @tabindex = "3",
+                                                    @disabled = "disabled"
+                                                })
+                                        </div>
+                                        <div class="field two wide required disabled" id="field_telefone">
+                                            @Html.LabelFor(model => model.Telefone, htmlAttributes: new { @class = "control-label" })
+                                            @Html.TextBoxFor(model => model.Telefone, new
+                                                {
+                                                    @class = "control-input",
+                                                    @tabindex = "4",
+                                                    @disabled = "disabled"
+                                                })
+                                        </div>
+                                    </div>
+                                    <div class="fields">
+                                        <div class="field five wide required disabled" id="field_endereco">
+                                            @Html.LabelFor(model => model.Endereco, htmlAttributes: new { @class = "control-label" })
+                                            @Html.TextBoxFor(model => model.Endereco, new
+                                                {
+                                                    @class = "control-input",
+                                                    @tabindex = "5",
+                                                    @disabled = "disabled"
+                                                })
+                                        </div>
+                                        <div class="field five wide required disabled" id="field_email">
+                                            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
+                                            @Html.TextBoxFor(model => model.Email, new
+                                                {
+                                                    @class = "control-input",
+                                                    @tabindex = "6",
+                                                    @disabled = "disabled"
+                                                })
+                                        </div>
+                                        <div class="align-items-end">
+                                            <div class="ui icon buttons">
+                                                <a class="ui button icon labeled bgm-orange-bnb btnReportarHorasEmLote" id="btn-atualizarcliente"><i class="user icon"></i>Atualizar cliente</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="fields">
-                                    <div class="field three wide required disabled" id="field_telefone">
-                                        @Html.LabelFor(model => model.Telefone, htmlAttributes: new { @class = "control-label" })
-                                        @Html.TextBoxFor(model => model.Telefone, new
-                                            {
-                                                @class = "control-input",
-                                                @tabindex = "4",
-                                                @disabled = "disabled"
-                                            })
-                                    </div>
-                                    <div class="field six wide required disabled" id="field_endereco">
-                                        @Html.LabelFor(model => model.Endereco, htmlAttributes: new { @class = "control-label" })
-                                        @Html.TextBoxFor(model => model.Endereco, new
-                                            {
-                                                @class = "control-input",
-                                                @tabindex = "5",
-                                                @disabled = "disabled"
-                                            })
-                                    </div>
-                                    <div class="field six wide required disabled" id="field_email">
-                                        @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
-                                        @Html.TextBoxFor(model => model.Email, new
-                                            {
-                                                @class = "control-input",
-                                                @tabindex = "6",
-                                                @disabled = "disabled"
-                                            })
-                                    </div>
-                                </div>
-                                
                                 <div class="fields">
                                     <div class="field three wide required disabled" id="field_TipoCustodia">
                                         @Html.LabelFor(model => model.TipoCustodia)
                                         @Html.DropDownListFor(model => model.TipoCustodia, new SelectList(listaTipoCustodia, "Codigo", "Descricao"), "Custódia Própria", new { @class = "control-dropdown", @tabindex = "7" })
                                     </div>
-                                    <div class="field three wide required disabled">
-                                        @Html.LabelFor(model => model.ValorAcao, htmlAttributes: new { @class = "control-label" })
-                                        @Html.TextBoxFor(model => model.ValorAcao, "0", new
+                                    <div class="field three wide required disabled" id="field_QuantidadeMaxima">
+                                        @Html.LabelFor(model => model.QuantidadeMaxima)
+                                        @Html.TextBoxFor(model => model.QuantidadeMaxima, new
                                             {
-                                                @tabindex = "8",
-                                                @class = "control-input currency",
-                                                @onkeyup = "mascara(this, mmoeda);",
+                                                @class = "control-input",
+                                                @tabindex = "7",
+                                                @type = "number",
+                                                @min = "1",
                                                 @disabled = "disabled"
                                             })
                                     </div>
@@ -152,9 +177,20 @@
                                         @Html.TextBoxFor(model => model.Quantidade, new
                                             {
                                                 @class = "control-input",
-                                                @tabindex = "9",
+                                                @tabindex = "8",
                                                 @type = "number",
-                                                @min = "1",
+                                                @min = 1,
+                                                @max = 1,
+                                                @disabled = "disabled"
+                                            })
+                                    </div>
+                                    <div class="field three wide required disabled">
+                                        @Html.LabelFor(model => model.ValorAcao, htmlAttributes: new { @class = "control-label" })
+                                        @Html.TextBoxFor(model => model.ValorAcao, "0", new
+                                            {
+                                                @tabindex = "9",
+                                                @class = "control-input currency",
+                                                @onkeyup = "mascara(this, mmoeda);",
                                                 @disabled = "disabled"
                                             })
                                     </div>

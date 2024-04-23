@@ -101,6 +101,8 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
 
                 var clienteAtualizado = _atualizarClienteEventHandler.Handle(eventoAtualizarCliente, cancellationToken);
                 var novaCarteira = await _criarCarteiraEventHandler.Handle(eventoCriarCarteira, cancellationToken);
+
+                ViewBag.SucessoInsercao = true;
                 return this.View(viewModel);
             }
             catch (RulesException ex)
@@ -113,14 +115,17 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
                         Propriedade = x.Key,
                         Erros = x.Value
                     });
-
-                return this.PartialView("_ErrosDeValidacao", rulesError);
+                ViewBag.SucessoInsercao = false;
+                ViewBag.Erros = rulesError.ToList();
+                return this.View(viewModel);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro de exceção.");
-                this.TempData["SucessoInsercao"] = false;
-                this.TempData["TempError"] = string.Format("Message: {0}\nStackTrace: {1}", ex.Message, ex.StackTrace);
+                ViewBag.SucessoInsercao = false;
+            #if DEBUG
+                ViewBag.TempError = string.Format("Message: {0}\nStackTrace: {1}", ex.Message, ex.StackTrace);
+            #endif
                 return this.View(viewModel);
             }
         }
@@ -168,12 +173,13 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             newModel.CPFOuCNPJ = cpfCnpj;
 
             newModel.NomeInvestidor = cliente.NomeAcionista;
-            newModel.Endereco = cliente.Endereco;// "Rua Nunes Valente, 2390 AP 402";
-            newModel.Email = cliente.Email;// "camillacgas@gmail.com";
-            newModel.Telefone = cliente.Telefone;// "(85) 997673062";
+            newModel.Endereco = cliente.Endereco;
+            newModel.Email = cliente.Email;
+            newModel.Telefone = cliente.Telefone;
             newModel.TipoPessoa = cliente.TipoPessoa == "Física" ? 1 : 2;
             newModel.TipoCustodia = cliente.TipoCustodia == "1-CUSTÓDIA PRÓPRIA" ? 1 : 0;
-            newModel.ValorAcao = cliente.ValorUnitarioPorAcao;//33.33m;
+            newModel.ValorAcao = cliente.ValorUnitarioPorAcao;
+            newModel.QuantidadeMaxima = cliente.DireitoSubscricao;
 
             return this.JsonDeny(newModel);
         }
@@ -205,7 +211,7 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
         {
             var list = new List<ManifestoNewViewModel>();
 
-            for (int i = 1; i <= 15; i++)
+            for (int i = 1; i <= 3; i++)
             {
                 var dados = BuscaDadosInvestidor(cpfCnpj);
                 dados.Id = i;
