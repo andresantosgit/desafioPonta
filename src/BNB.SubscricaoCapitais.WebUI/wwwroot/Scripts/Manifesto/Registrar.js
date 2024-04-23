@@ -18,7 +18,53 @@ $(document).ready(function () {
         e.preventDefault();
         AtualizaValorTotal();
     });
+
+    $('#btn-atualizarcliente').on('click', function (e) {
+        e.preventDefault();
+        AtualizarCliente();
+    });
 });
+
+function AtualizarCliente() {
+    var model = $("form").serialize();
+    var cpfCnpj = $('#CPFOuCNPJ').val();
+    if (cpfCnpj) {
+        $('.ui.modal')
+            .modal({
+                closable: false
+            })
+            .modal('show');
+
+        $.ajax({
+            type: 'POST',
+            url: ROOT_URL + '/Manifesto/AtualizarCliente',
+            data: model,
+        }).done(function (data, textStatus, jqXHR) {
+            $("html, body").animate({ scrollTop: $('html, body').height() }, 1500, "easeInOutExpo");
+            $('.ui.modal').modal('hide');
+            PreencheCampos(data);
+            showMessage('positive', 'Cliente atualizado com sucesso!');
+        }).fail(function (request, textStatus, errorThrown) {
+            $('.ui.modal').modal('hide');
+            showMessage('negative', 'Não foi possível atualizar o cliente.');
+
+            var vm = request.responseJSON;
+            if (request.status === 400 && request.responseJSON !== undefined && request.responseJSON !== null) {
+                $.ajax({
+                    type: 'POST',
+                    url: ROOT_URL + '/Erros/MostrarErrosValidacao',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ erros: vm })
+                }).done(function (data) {
+                    $('#erros-validacao').html(data);
+                }).fail(function (error) {
+                    console.log('Implementar error generico no controller de erros.');
+                });
+            }
+        });
+    }
+}
+
 
 function ConsultarDados(cpfCnpj) {
     if (cpfCnpj) {
@@ -35,25 +81,18 @@ function ConsultarDados(cpfCnpj) {
                 cpfCnpj: cpfCnpj
             }
         }).done(function (data, textStatus, jqXHR) {
-            $("html, body").animate({ scrollTop: $('html, body').height() }, 1500, "easeInOutExpo");
             $('.ui.modal').modal('hide');
             PreencheCampos(data);
         }).fail(function (request, textStatus, errorThrown) {
             $('.ui.modal').modal('hide');
-            
-            var vm = request.responseJSON;
-            if (request.status === 400 && request.responseJSON !== undefined && request.responseJSON !== null) {
-                $.ajax({
-                    type: 'POST',
-                    url: ROOT_URL + '/Erros/MostrarErrosValidacao',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ erros: vm })
-                }).done(function (data) {
-                    $('#erros-validacao').html(data);
-                }).fail(function (error) {
-                    console.log('Implementar error generico no controller de erros.');
-                });
+
+            if (request.status === 404) {
+                textStatus = 'Cliente não encontrado!';
             }
+
+            showMessage('negative', textStatus);
+            LimparCampos();
+            $('#CPFOuCNPJ').val(cpfCnpj);
         });
     }    
 }
@@ -106,7 +145,12 @@ function AtualizaSelect(id, value) {
     $("#field_" + id + " label.ui-dropdown-label").text(desc);
 }
 
-function limparCampos() {
+function LimparCamposButton() {
+    LimparCampos();
+    location.reload(true);
+}
+
+function LimparCampos() {
     $('#CPFOuCNPJ').val("");
     $('#TipoPessoa').val("");
     $('#NomeInvestidor').val("");
@@ -127,9 +171,7 @@ function limparCampos() {
     $('#Telefone').prop("disabled", true);
     $('#Endereco').prop("disabled", true);
     $('#Email').prop("disabled", true);
-
-    location.reload(true);
-};
+}
 
 function AtualizaValorTotal() {
     var valorAcao = $("#ValorAcao").val() || 0;
@@ -140,4 +182,14 @@ function AtualizaValorTotal() {
     total = mmoeda(String(total.toFixed(2)));
 
     $('#ValorTotal').val(total);
+}
+
+function showMessage(classPositiveOrNegative, message) {
+    $('#messageContent').text(message);
+
+    $("#message").removeClass('visible positive negative');
+    $("#message").addClass('hidden ' + classPositiveOrNegative);
+    $("#message").transition('fade');
+
+    addEventToMessageAutoClose();
 }
