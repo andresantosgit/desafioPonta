@@ -127,10 +127,11 @@ namespace BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto
         public string? MatriculaSolicitante { get; set; }
 
         public string? Status { get; set; }
+        public string? PixCopiaECola { get; set; }
 
-        public DateTime? DataCriacao { get; set; }
+        public DateTimeOffset? DataCriacao { get; set; }
 
-        public DateTime? DataAtualizacao { get; set; }
+        public DateTimeOffset? DataAtualizacao { get; set; }
 
         public string TipoPessoaText
         {

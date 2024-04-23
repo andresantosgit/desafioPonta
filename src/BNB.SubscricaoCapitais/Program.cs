@@ -1,13 +1,18 @@
 using BNB.ProjetoReferencia.Core.Common.Extensions;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.HostedServices;
+using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Webhook.HostedServices;
 using BNB.ProjetoReferencia.Filters;
 using BNB.ProjetoReferencia.Infrastructure.Common.Extensions;
 using BNB.ProjetoReferencia.Infrastructure.Database;
+using BNB.ProjetoReferencia.Infrastructure.Http.Configuration;
+using BNB.ProjetoReferencia.Infrastructure.Http.MessageHandler;
+using BNB.ProjetoReferencia.Infrastructure.Http.Repositories;
 using BNB.ProjetoReferencia.Infrastructure.Https;
 using BNB.S095.BNBAuth.Middleware;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Internal;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -91,6 +96,8 @@ builder.Services.AddHostedService<CarteiraHostedService>();
 
 // Adiciona o hosted service do webhook para cadastro da url
 builder.Services.AddHostedService<WebhookHostedService>();
+
+builder.Services.AddHttpClient<ICobrancaRepository, CobrancaRepository>().AddHttpMessageHandler<HttpMessageClientHandler>();
 
 // .AddHttpContextAccessor() é usado em aplicações ASP.NET Core para adicionar o serviço
 // IHttpContextAccessor ao contêiner de injeção de dependência.
