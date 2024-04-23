@@ -47,16 +47,15 @@
                         {
                             Html.RenderPartial("_ErrosDeValidacao", (IEnumerable<ErroValidacao>)ViewBag.Erros);
                         }
-                        @if (ViewBag.TempError != null)
-                        {
-                            <div class="field">
-                                <div id="message" class="ui negative message">
-                                    <i class="close icon"></i>
-                                    <p id="messageContent">@ViewBag.TempError</p>
-                                </div>
-                                <br />
+
+                        <div class="field">
+                            <div id="message" class="ui negative message hidden">
+                                <i class="close icon"></i>
+                                <p id="messageContent">@ViewBag.TempError</p>
                             </div>
-                        }
+                            <br />
+                        </div>
+
                         @if (ViewBag.Pendencias != null)
                         {
                             @* Html.Partial("_ErrosDeValidacao", (IEnumerable<ErroValidacao>)ViewBag.Pendencias); *@
@@ -96,7 +95,7 @@
                                     </div>
                                     <div class="align-items-end">
                                         <div class="ui icon buttons">
-                                            <a class="ui button icon labeled bgm-orange-bnb btnReportarHorasEmLote" id="btn-consultar"><i class="search icon"></i>Pesquisar</a>
+                                            <a class="ui button icon labeled bgm-orange-bnb" id="btn-consultar"><i class="search icon"></i>Pesquisar</a>
                                         </div>
                                     </div>
                                 </div>
@@ -149,7 +148,7 @@
                                         </div>
                                         <div class="align-items-end">
                                             <div class="ui icon buttons">
-                                                <a class="ui button icon labeled bgm-orange-bnb btnReportarHorasEmLote" id="btn-atualizarcliente"><i class="user icon"></i>Atualizar cliente</a>
+                                                <a class="ui button icon labeled bgm-orange-bnb" id="btn-atualizarcliente"><i class="user icon"></i>Atualizar cliente</a>
                                             </div>
                                         </div>
                                     </div>
@@ -208,7 +207,7 @@
                                 </div>
                                 <div class="field right floated">
                                     @* @Html.ActionLink("Cancelar", "Index", "Home", new { }, new { @class = "ui button bgm-gray-bnb" }) *@
-                                    <a class="ui button bgm-gray-bnb" id="btn-limpar" onclick="limparCampos()">Limpar campos</a>
+                                    <a class="ui button bgm-gray-bnb" id="btn-limpar" onclick="LimparCamposButton()">Limpar campos</a>
                                     <button class="ui button bgm-wine-bnb icon labeled" type="submit" id="save-button">
                                         <i class="save icon"></i>
                                         Manifestar interesse
@@ -247,7 +246,4 @@
     <script src="~/Scripts/Layout/closeEventMessages.js"></script>
     <script src="~/Scripts/Manifesto/Consultar.js"></script>
     <script src="~/Scripts/Manifesto/Registrar.js"></script>
-    <script>
-        var info;
-    </script>
 }
