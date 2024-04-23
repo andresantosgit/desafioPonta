@@ -210,12 +210,17 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             cpfCnpj = Uri.UnescapeDataString(cpfCnpj);
             var cliente = await _clienteRepository.FindByIdInvestidorAsync(cpfCnpj, cancellationToken);
             if (cliente is null)
-                return BadRequest();
-
+            {
+                var model = new ManifestoNewViewModel();
+                model.CPFOuCNPJ = cpfCnpj;
+                this.TempData["Success"] = false;
+                return NotFound(model);
+            }
+            
             var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(cpfCnpj, cancellationToken);
             var statusSaldo = _configuration["StatusSaldo"]!;
             var quantidadeAtual = carteiras.Where(x => statusSaldo.Split(";").Contains(x.Status)).Sum(y => y.QuantidadeIntegralizada);
-
+                
             var newModel = new ManifestoNewViewModel();
             newModel.MatriculaSolicitante = _authService.Matricula;
             newModel.CPFOuCNPJ = cpfCnpj;
@@ -230,6 +235,43 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             newModel.QuantidadeMaxima = cliente.DireitoSubscricao - quantidadeAtual;
 
             return this.JsonDeny(newModel);
+        }
+
+        [HttpPost]
+        [Validate]
+        public async Task<ActionResult> AtualizarCliente(ManifestoNewViewModel viewModel, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var eventoAtualizarCliente = new DomainEvent<AtualizarClienteEvent>(new(viewModel.CPFOuCNPJ, viewModel.Endereco, viewModel.Telefone, viewModel.Email, viewModel.MatriculaSolicitante));
+                var clienteAtualizado = await _atualizarClienteEventHandler.Handle(eventoAtualizarCliente, cancellationToken);
+
+                this.TempData["Success"] = true;
+                return this.JsonDeny(viewModel);
+            }
+            catch (RulesException ex)
+            {
+                var rulesError = ex.Messages
+                    .GroupBy(x => x.Member)
+                    .ToDictionary(x => x.Key, x => x.Select(y => y.Message).Where(z => z != null).ToArray())
+                    .Select(x => new ErroValidacao()
+                    {
+                        Propriedade = x.Key,
+                        Erros = x.Value
+                    });
+                this.TempData["Success"] = false;
+                ViewBag.Erros = rulesError.ToList();
+                return this.JsonDeny(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro de exceção.");
+                this.TempData["Success"] = false;
+#if DEBUG
+                ViewBag.TempError = string.Format("Message: {0}\nStackTrace: {1}", ex.Message, ex.StackTrace);
+#endif
+                return this.JsonDeny(viewModel);
+            }
         }
 
         private ManifestoNewViewModel BuscaDadosInvestidor(string cpfCnpj)

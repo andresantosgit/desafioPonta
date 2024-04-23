@@ -37,6 +37,8 @@ function ListarManifestos(cpfCnpj) {
     showModal(true);
 
     $('#listaManifestos').puidatatable({
+        scrollable: false,
+        animate: false,
         columns: [
                     { field: 'Id', headerText: 'ID', filter: true, sortable: true, headerStyle: "width:5%" },
                     { field: 'NomeInvestidor', headerText: 'NOME', filter: true, sortable: true, headerStyle: "width:20%" },
@@ -106,7 +108,6 @@ function ListarManifestos(cpfCnpj) {
                 success: function (response) {
                     showModal(false);
                     $('#global-filter-demanda').prop('hidden', false);
-                    $("html, body").animate({ scrollTop: $('html, body').height() }, 1500, "easeInOutExpo");
                     $('#TotalLinhasManifestos').val(response.length);
                     $('#btnDownload').show();
                     callback.call(this, response);
