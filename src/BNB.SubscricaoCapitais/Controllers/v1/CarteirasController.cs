@@ -9,6 +9,7 @@ using BNB.ProjetoReferencia.Inputs;
 using BNB.ProjetoReferencia.Models;
 using Microsoft.AspNetCore.Mvc;
 using QRCoder;
+using System.Text;
 
 namespace BNB.ProjetoReferencia.Controllers.v1;
 
@@ -22,31 +23,59 @@ public class CarteirasController : ControllerBase
     /// <summary>
     /// Obtem todas as carteiras de todos investidores
     /// </summary>
+    /// <param name="status"></param>
+    /// <param name="exportar"></param>
     /// <param name="carteiraRepository"></param>
     /// <param name="clienteRepository"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CarteiraModel>))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorModel))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorModel))]
     public async Task<ActionResult> Get(
-        [FromServices] ICarteiraRepository carteiraRepository,
-        [FromServices] IClienteRepository clienteRepository,
-        CancellationToken cancellationToken)
+         [FromQuery] string? status,
+         [FromQuery] bool? exportar,
+         [FromServices] ICarteiraRepository carteiraRepository,
+         [FromServices] IClienteRepository clienteRepository,
+         CancellationToken cancellationToken)
     {
         var carteiras = await carteiraRepository.FindAllAsync(cancellationToken);
         if (!carteiras.Any())
             return NoContent();
+
+        if (!string.IsNullOrWhiteSpace(status))
+            carteiras = carteiras.Where(x => x.Status.Equals(status, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
         var clientesIdsInvestidor = carteiras
             .Select(x => x.IdInvestidor)
             .Distinct()
             .Select(x => clienteRepository.FindByIdInvestidorAsync(x, cancellationToken).Result)
             .ToArray();
-        
-        return Ok(carteiras.Select(x => CriarModelo(x, clientesIdsInvestidor.FirstOrDefault(y => y.IdInvestidor == x.IdInvestidor))).ToList());
+
+        var carteiraClientes = carteiras.Select(x => CriarModelo(x, clientesIdsInvestidor.FirstOrDefault(y => y.IdInvestidor == x.IdInvestidor))).ToList();
+
+        if (exportar.HasValue && exportar.Value)
+        {
+            using (var memoryStream = new MemoryStream())
+            using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+            {
+                streamWriter.WriteLine($"{nameof(CarteiraModel.Id)};{nameof(CarteiraModel.IdInvestidor)};{nameof(CarteiraModel.NomeAcionista)};{nameof(CarteiraModel.TipoPessoa)};{nameof(CarteiraModel.TxId)};{nameof(CarteiraModel.DataCriacao)};{nameof(CarteiraModel.DataAtualizacao)};{nameof(CarteiraModel.QuantidadeIntegralizada)};{nameof(CarteiraModel.ValorUnitarioPorAcao)};{nameof(CarteiraModel.ValorTotal)};{nameof(CarteiraModel.Status)};{nameof(CarteiraModel.PixCopiaECola)}");
+                foreach (var carteira in carteiraClientes)
+                    streamWriter.WriteLine($"{carteira.Id};{carteira.IdInvestidor};{carteira.NomeAcionista};{carteira.TipoPessoa};{carteira.TxId};{carteira.DataCriacao};{carteira.DataAtualizacao};{carteira.QuantidadeIntegralizada};{carteira.ValorUnitarioPorAcao};{carteira.ValorTotal};{carteira.Status};{carteira.PixCopiaECola}");
+
+                streamWriter.Flush();
+                memoryStream.Position = 0;
+                var fileContentResult = new FileContentResult(memoryStream.ToArray(), "application/octet-stream")
+                {
+                    FileDownloadName = $"RelatorioGlobal.csv"
+                };
+                return fileContentResult;
+            }
+        }
+
+        return Ok(carteiraClientes);
     }
 
     /// <summary>
@@ -186,25 +215,20 @@ public class CarteirasController : ControllerBase
         var html = (await System.IO.File.ReadAllTextAsync("./manifesto.html"))
             .Replace("{Identificador}", carteira.IdInvestidor)
             .Replace("{Nome}", cliente.NomeAcionista)
-            //.Replace("{Endereco}", cliente.Endereco)
-            //.Replace("{Email}", cliente.Email)
-            //.Replace("{Telefone}", cliente.Telefone)
+            .Replace("{Endereco}", cliente.Endereco)
+            .Replace("{Email}", cliente.Email)
+            .Replace("{Telefone}", cliente.Telefone)
             .Replace("{QuantidadeTotal}", cliente.DireitoSubscricao.ToString())
             .Replace("{QuantidadeManifestada}", carteira.QuantidadeIntegralizada.ToString())
             .Replace("{QuantidadeManifestadaValor}", carteira.ValorTotal.ToString())
             ;
 
         var documento = pdfGenerator.Generate(html, cancellationToken);
-
-        string qrCodeBase64 = Convert.ToBase64String(documento);
-        return Ok(qrCodeBase64);
-
-        //var fileContentResult = new FileContentResult(documento, "application/octet-stream")
-        //{
-        //    FileDownloadName = $"Manifesto_{cliente.NomeAcionista}.pdf"
-        //};
-        //
-        //return fileContentResult;
+        var fileContentResult = new FileContentResult(documento, "application/octet-stream")
+        {
+            FileDownloadName = $"{carteira.Id.ToString("D4")}Manifesto_{cliente.NomeAcionista}.pdf"
+        };
+        return fileContentResult;
     }
 
     private CarteiraModel CriarModelo(CarteiraEntity carteira, ClienteEntity? cliente = null) => new(this, carteira, cliente);
