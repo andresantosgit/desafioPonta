@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Json;
 using System.Text.Json;
 using BNB.S095.BNBAuth;
+using IdentityModel.Client;
 
 namespace BNB.ProjetoReferencia.Infrastructure.Http.Repositories;
 
@@ -50,7 +51,14 @@ public class CobrancaRepository
 
         var content = JsonSerializer.Serialize(entity, serializeOptions);
 
-        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ContextoSeguranca.GetCredencialAplicacao().Token);
+        var result = await _httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+        {
+            Address = "https://sso.dreads.bnb/auth/realms/Desenv/protocol/openid-connect/token",
+            ClientId = "s493-backend-subscricao-servico",
+            ClientSecret = "e6cde745-05c8-4490-8bdd-99589bea52b5"
+        });
+
+        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", result.AccessToken);
 
         using var response = await _httpClient.PostAsync(uri, new StringContent(content), ctx);
         if (!response.IsSuccessStatusCode) return default;

@@ -90,29 +90,29 @@ public class CarteiraHandler :
             cobranca.Devedor.Cpf = idInvestidor;
         }
 
-        carteira.TxId = "test";
-        carteira.Status = "ATIVA";
-        carteira.PixCopiaECola = "testee copia e cola";
-        var novaCarteira = await _carteiraRepository.AddAsync(carteira, cancellationToken);
-        await _carteiraRepository.SaveAsync(cancellationToken);
-        return novaCarteira;
+        //carteira.TxId = "test";
+        //carteira.Status = "ATIVA";
+        //carteira.PixCopiaECola = "testee copia e cola";
+        //var novaCarteira = await _carteiraRepository.AddAsync(carteira, cancellationToken);
+        //await _carteiraRepository.SaveAsync(cancellationToken);
+        //return novaCarteira;
 
-        //var retornoCobranca = await _cobrancaRepository.Add(cobranca, cancellationToken);
-        //
-        //if (retornoCobranca != null && retornoCobranca.TxId != null && retornoCobranca.Status != null && retornoCobranca.PixCopiaECola != null)
-        //{
-        //    carteira.TxId = retornoCobranca.TxId;
-        //    carteira.Status = retornoCobranca.Status;
-        //    carteira.PixCopiaECola = retornoCobranca.PixCopiaECola;
-        //    var novaCarteira = await _carteiraRepository.AddAsync(carteira, cancellationToken);
-        //    await _carteiraRepository.SaveAsync(cancellationToken);
-        //
-        //    return novaCarteira;
-        //}
-        //else
-        //{
-        //    throw new RulesException("CriacaoPagamentoError", "Erro ao criar chave PIX.");
-        //}
+        var retornoCobranca = await _cobrancaRepository.Add(cobranca, cancellationToken);
+
+        if (retornoCobranca != null && retornoCobranca.TxId != null && retornoCobranca.Status != null && retornoCobranca.PixCopiaECola != null)
+        {
+            carteira.TxId = retornoCobranca.TxId;
+            carteira.Status = retornoCobranca.Status;
+            carteira.PixCopiaECola = retornoCobranca.PixCopiaECola;
+            var novaCarteira = await _carteiraRepository.AddAsync(carteira, cancellationToken);
+            await _carteiraRepository.SaveAsync(cancellationToken);
+
+            return novaCarteira;
+        }
+        else
+        {
+            throw new RulesException("CriacaoPagamentoError", "Erro ao criar chave PIX.");
+        }
 
     }
 
