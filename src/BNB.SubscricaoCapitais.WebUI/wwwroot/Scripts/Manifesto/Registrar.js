@@ -68,12 +68,6 @@ function AtualizarCliente() {
 
 function ConsultarDados(cpfCnpj) {
     if (cpfCnpj) {
-        $('.ui.modal')
-            .modal({
-                closable: false
-            })
-            .modal('show');
-
         $.ajax({
             type: 'POST',
             url: ROOT_URL + '/Manifesto/ConsultarDados',
