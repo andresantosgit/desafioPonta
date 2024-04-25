@@ -1,6 +1,8 @@
 using BNB.ProjetoReferencia.Core.Common.Extensions;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.HostedServices;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
+using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities;
+using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Webhook.HostedServices;
 using BNB.ProjetoReferencia.Filters;
 using BNB.ProjetoReferencia.Infrastructure.Common.Extensions;
@@ -85,6 +87,8 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 // Configura o Http
 builder.Services.ConfigureHttp(builder.Configuration);
 
+builder.Services.AddSingleton<ITokenService, TokenService>();
+
 // Configura os serviços da infraestrutura
 builder.Services.AddInfrastructure();
 
@@ -96,8 +100,6 @@ builder.Services.AddHostedService<CarteiraHostedService>();
 
 // Adiciona o hosted service do webhook para cadastro da url
 builder.Services.AddHostedService<WebhookHostedService>();
-
-builder.Services.AddHttpClient<ICobrancaRepository, CobrancaRepository>().AddHttpMessageHandler<HttpMessageClientHandler>();
 
 // .AddHttpContextAccessor() é usado em aplicações ASP.NET Core para adicionar o serviço
 // IHttpContextAccessor ao contêiner de injeção de dependência.

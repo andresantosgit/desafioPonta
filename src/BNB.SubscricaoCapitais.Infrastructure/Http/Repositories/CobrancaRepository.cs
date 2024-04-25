@@ -11,6 +11,8 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using BNB.S095.BNBAuth;
 using IdentityModel.Client;
+using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities;
+using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
 
 namespace BNB.ProjetoReferencia.Infrastructure.Http.Repositories;
 
@@ -19,6 +21,7 @@ public class CobrancaRepository
     : ICobrancaRepository
 {
     private readonly HttpClient _httpClient;
+    private readonly ITokenService _tokenService;
     private readonly string _chave;
 
     #region Data Records
@@ -32,10 +35,11 @@ public class CobrancaRepository
 
     #endregion Data Records
 
-    public CobrancaRepository(IHttpClientFactory fatory, IConfiguration configuration)
+    public CobrancaRepository(IHttpClientFactory fatory, IConfiguration configuration, ITokenService tokekService)
     {
         _httpClient = fatory.CreateClient("cobranca");
-        _chave = configuration["CobrancaChave"];        
+        _chave = configuration["CobrancaChave"];
+        _tokenService = tokekService;
     }
 
     public async Task<CobrancaEntity> Add(CobrancaEntity entity, CancellationToken ctx)
@@ -51,14 +55,7 @@ public class CobrancaRepository
 
         var content = JsonSerializer.Serialize(entity, serializeOptions);
 
-        var result = await _httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-        {
-            Address = "https://sso.dreads.bnb/auth/realms/Desenv/protocol/openid-connect/token",
-            ClientId = "s493-backend-subscricao-servico",
-            ClientSecret = "e6cde745-05c8-4490-8bdd-99589bea52b5"
-        });
-
-        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", result.AccessToken);
+        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _tokenService.GetToken());
 
         using var response = await _httpClient.PostAsync(uri, new StringContent(content), ctx);
         if (!response.IsSuccessStatusCode) return default;
@@ -82,7 +79,7 @@ public class CobrancaRepository
     {
         var uri = GetUriById(txId);
 
-        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ContextoSeguranca.GetCredencialAplicacao().Token);
+        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _tokenService.GetToken());
 
         using var response = await _httpClient.GetAsync(uri, ctx);
         if (!response.IsSuccessStatusCode) return default;
