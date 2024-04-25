@@ -1,6 +1,7 @@
 ﻿using BNB.ProjetoReferencia.Core.Common.Attributes;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
+using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Webhook.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Webhook.Interfaces;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -18,6 +19,7 @@ public class WebhookRepository
 {
     private readonly HttpClient _httpClient;
     private readonly string _chave;
+    private readonly ITokenService _tokenService;
 
     #region Data Records
 
@@ -25,10 +27,11 @@ public class WebhookRepository
 
     #endregion Data Records
 
-    public WebhookRepository(IHttpClientFactory fatory, IConfiguration configuration)
+    public WebhookRepository(IHttpClientFactory fatory, IConfiguration configuration, ITokenService tokenService)
     {
         _httpClient = fatory.CreateClient("cobranca");
-        _chave = configuration["CobrancaChave"];        
+        _chave = configuration["CobrancaChave"];
+        _tokenService = tokenService;
     }
 
     public async Task<WebhookEntity> Update(WebhookEntity entity, CancellationToken ctx)
@@ -41,7 +44,9 @@ public class WebhookRepository
             WriteIndented = true
         };
 
-        var content = JsonSerializer.Serialize(entity, serializeOptions);        
+        var content = JsonSerializer.Serialize(entity, serializeOptions);
+
+        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _tokenService.GetToken());
 
         using var response = await _httpClient.PutAsync(uri, new StringContent(content), ctx);
         if (!response.IsSuccessStatusCode) return default;

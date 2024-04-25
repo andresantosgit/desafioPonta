@@ -25,9 +25,9 @@ public class HttpMessageClientHandler : DelegatingHandler
 
         var result = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
         {
-            Address = "https://sso.dreads.bnb/auth/",
+            Address = "https://sso.dreads.bnb/auth/realms/Desenv/protocol/openid-connect/token",
             ClientId = "s493-backend-subscricao-servico",
-            ClientSecret = "17d81ec8-e281-47fc-8e47-687def20af82"
+            ClientSecret = "e6cde745-05c8-4490-8bdd-99589bea52b5"
         });
 
         if (result.IsError)

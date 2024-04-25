@@ -8,5 +8,5 @@ public interface ICarteiraRepository : IBaseRepository<CarteiraEntity, int>
     Task<List<CarteiraEntity>> FindAllAsync(CancellationToken cancellationToken);
     Task<List<CarteiraEntity>> FindAllByIdInvestidorAsync(string idInvestidor, CancellationToken cancellationToken);
     Task<CarteiraEntity?> FindByTxIdAsync(string txId, CancellationToken cancellationToken);
-    Task<List<CarteiraEntity>> FindAllByStatusAndDateAsync(string status, DateTimeOffset minDataCriacao, CancellationToken cancellationToken);
+    Task<List<CarteiraEntity>> FindAllByStatusAndDateAsync(string status, CancellationToken cancellationToken);
 }

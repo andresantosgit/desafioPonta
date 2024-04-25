@@ -39,23 +39,34 @@ public class CarteiraHostedService : IHostedService
                     var carteiraRepository = scope.ServiceProvider.GetRequiredService<ICarteiraRepository>();
                     var cobrancaRepository = scope.ServiceProvider.GetRequiredService<ICobrancaRepository>();
                     var atualizarCarteiraEventHandler = scope.ServiceProvider.GetRequiredService<IRequestHandler<DomainEvent<AtualizarCarteiraEvent>, CarteiraEntity>>();
-                    var carteiras = await carteiraRepository.FindAllByStatusAndDateAsync("ATIVA", DateTimeOffset.Now.AddHours(-25), cancellationToken);
+                    var carteiras = await carteiraRepository.FindAllByStatusAndDateAsync("ATIVA", cancellationToken);
 
                     foreach (var carteira in carteiras)
                     {
-                        // TODO: Precisamos verificar se a carteira ainda está pendente, chamando a api
-                        var retornoCobranca = await cobrancaRepository.GetByTxId(carteira.TxId, cancellationToken);
-                        if (retornoCobranca.TxId != null && retornoCobranca.Status != null)
+                        if(new DateTime(carteira.DataCriacao.Year, carteira.DataCriacao.Month, carteira.DataCriacao.Day, 23, 59, 59) <= DateTime.Now)
                         {
-                            var evento = new DomainEvent<AtualizarCarteiraEvent>(new(carteira.Id, carteira.IdInvestidor, retornoCobranca.Status));
+                            var evento = new DomainEvent<AtualizarCarteiraEvent>(new(carteira.Id, carteira.IdInvestidor, "EXPIRADO"));
                             await atualizarCarteiraEventHandler.Handle(evento, cancellationToken);
+                        }
+                        else
+                        {
+                            var retornoCobranca = await cobrancaRepository.GetByTxId(carteira.TxId, cancellationToken);
+                            if (retornoCobranca.TxId != null && retornoCobranca.Status != null)
+                            {
+                                var evento = new DomainEvent<AtualizarCarteiraEvent>(new(carteira.Id, carteira.IdInvestidor, retornoCobranca.Status));
+                                await atualizarCarteiraEventHandler.Handle(evento, cancellationToken);
+                            }
                         }
                     }
                 }
             }
+            catch(Exception err)
+            {
+
+            }
             finally
             {
-                await Task.Delay(TimeSpan.FromMinutes(1));
+                await Task.Delay(TimeSpan.FromHours(1), cancellationToken);
             }
         }
     }

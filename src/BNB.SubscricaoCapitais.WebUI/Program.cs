@@ -33,13 +33,13 @@ builder.Services.AddScoped<SegurancaAutorizaActionFilter>();
 //builder.Services.AddScoped<ExceptionActionFilter>();
 builder.Services.AddScoped<Validate>();
 
-builder.Services.AddHttpClient<ICobrancaRepository, CobrancaRepository>().AddHttpMessageHandler<HttpMessageClientHandler>();
-
 // Configura a Database
 builder.Services.ConfigureDatabase(builder.Configuration);
 
 // Configura o Http
 builder.Services.ConfigureHttp(builder.Configuration);
+
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 // Configura os serviços da infraestrutura
 builder.Services.AddInfrastructure();
