@@ -239,6 +239,33 @@
 <div class="ui content">
     
 </div>
+<div class="ui longer modal" id="PixDetalhe">
+    <i class="close icon"></i>
+    <div class="header">PIX</div>
+    <div class="ui container center aligned bootstrap">
+        <img id="imgPix" class="w-50" />
+        <div class="ui container center aligned">
+            <h5 class="">Pix copia e cola:</h5>
+            <p id="pixCopiaCola"></p>
+            <h4 class="b container center aligned mb-5">
+                <a class="text-danger" href="" id="linkPixModalTermo">Para a conclusão do processo, clique aqui para baixar o termo e colher as assinaturas.</a>
+            </h4>
+            <div class="ui icon buttons mr-1">
+                <a class="ui button icon labeled bgm-orange-bnb mr-1" id="btn-copyPix"><i class="copy icon"></i>Copiar PIX</a>
+            </div>
+            <div class="ui icon buttons">
+                <a class="ui button icon labeled bgm-wine-bnb" href="" id="btnPixModalTermo"><i class="download icon"></i>Baixar termo</a>
+            </div>
+        </div>
+        <br /><br />
+    </div>
+</div>
+<div class="ui modal" id="loadingModal">
+    <div class="ui active dimmer">
+        <div class="ui indeterminate text loader">Aguarde...</div>
+    </div>
+    <p></p>
+</div>
 
 @section Scripts {
 

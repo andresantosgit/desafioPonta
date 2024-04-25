@@ -6,22 +6,9 @@
         ConsultarManifestos(cpfCnpj);
     });
 
-    $('#listaManifestos').click(function (e) {
-        var clicado = $(e.target);
-
-        var actives = document.getElementsByClassName('ui-state-active');
-
-        for (var i = 0; i < actives.length; i++) {
-            var isNumeroPagina = !isNaN(parseFloat(actives[i].textContent))
-
-            if (isNumeroPagina) {
-                let pagina = actives[i].textContent;
-                let totalDeLinhas = $('#TotalLinhasManifestos').val();
-                let intervaloInicial = (pagina * 10) - 9;
-                let intervaloFinal = pagina * 10 < totalDeLinhas ? pagina * 10 : totalDeLinhas;
-                $('#volumeManifestos').text(intervaloInicial + ' a ' + intervaloFinal + ' de ' + totalDeLinhas);
-            }
-        }
+    $('#btn-copyPix').click(function (e) {
+        var pixCopiaCola = $('#pixCopiaCola').text();
+        navigator.clipboard.writeText(pixCopiaCola);
     });
 });
 
@@ -33,9 +20,6 @@ function ConsultarManifestos(cpfCnpj) {
 }
 
 function ListarManifestos(cpfCnpj) {
-
-    showModal(true);
-
     $('#listaManifestos').puidatatable({
         scrollable: false,
         animate: false,
@@ -78,8 +62,8 @@ function ListarManifestos(cpfCnpj) {
                     },
                     {
                         field: 'actions', headerText: '', headerStyle: "width:15%", content: function (rowData) {
-                            var _urlPix = ROOT_URL + "/Manifesto/GerarPix?codigo=" + rowData.Id;
-                            var btnPix = '<a class="button default highlight" data-tooltip="Gerar PIX" href="' + _urlPix + '"><i class="money icon"></i></a>';
+                            var btnPix = '<a onclick="popUpGerarPix(' + rowData.Id + ')" class="button default" data-tooltip="Gerar PIX"> <i class="money icon"></i></a>';
+
                             var btnVisualizarDocumento = '<a class="button default highlight" data-tooltip="Visualizar Documento" href="#" onclick="javascript:GerarRelatorioDemanda(\'' + rowData.Codigo + '\');"><i class="ui file red pdf outline icon"></i></a>';
                             var btns = [];
 
@@ -120,7 +104,6 @@ function ListarManifestos(cpfCnpj) {
                     $('#volumeManifestos').text(intervaloInicial + ' a ' + intervaloFinal + ' de ' + totalDeLinhas);
                 },
                 error: function (request, status, error) {
-                    showModal(false);
                     $('#global-filter-demanda').prop('hidden', true);
                     if (request.status === 400 && request.responseJSON !== undefined) {
                         var vm = request.responseJSON;
@@ -207,29 +190,6 @@ function filtroDePagina() {
     }
 }
 
-function GetDemandaPorCodigo(codigo) {
-    $.ajax({
-        type: 'GET',
-        url: ROOT_URL + '/DemandaAuditoria/GetDemandaPorCodigo',
-        data: {
-            Codigo: codigo
-        }
-    }).done(function (data) {
-        var detalhe = {
-            Texto: data.Texto
-        };
-        hidePopup(codigo);
-        var stringReduzida = detalhe.Texto.length < 400 ? detalhe.Texto : detalhe.Texto.substr(0, 399) + "...";
-        $('#D' + codigo).attr("data-title", "Texto: ")
-        $('#D' + codigo).attr("data-content", "" + stringReduzida);
-        $('#D' + codigo).popup('show');
-        $('.ui.popup').attr('style', function (i, s) { return s + 'max-width: 850px; min-width:350px; !important;' });
-
-    }).fail(function () {
-        $('#loader').transition('fade');
-        showModal(false);
-    });
-}
 
 function hidePopup(codigo) {
 
@@ -301,5 +261,40 @@ function ExportarDados() {
             $('#respostaAcaoFalha').text(error);
             $('#modalErro').modal('show');
         }
+    });
+}
+
+function popUpGerarPix(codigo) {
+    $('#loadingModal').modal('show');
+    $.ajax({
+        type: 'GET',
+        url: ROOT_URL + '/Manifesto/GerarPix',
+        data: { 'codigo': codigo }
+    }).done(function (data) {
+        $('#loadingModal').modal('hide');
+        if (data !== undefined && data !== null) {
+            var qrCodeBase64 = data.qrCodeBase64;
+            $("#imgPix").prop('src', "data:image/jpg;base64," + qrCodeBase64);
+            $("#pixCopiaCola").text(data.pixCopiaCola);
+
+            setTimeout(function () {
+                $('#PixDetalhe').modal({ closable: false }).modal('show');
+            }, 1000);
+        }
+    }).fail(function (error) {
+        $('#loadingModal').modal('hide');
+        var mensagemErro = $('<div />')
+            .addClass('ui message visible negative .other-messages')
+            .prop('id', 'sucesso-execucao-ajax');
+
+        var textoMensagemErro = $('<p />')
+            .text('Ocorreu um erro ao recuperar o PIX Qr Code.');
+
+        mensagemErro.append(textoMensagemErro);
+        $('#erros-validacao').html(mensagemErro);
+        setTimeout(function () {
+            $('#sucesso-execucao-ajax')
+                .transition('fade');
+        }, 5000);
     });
 }

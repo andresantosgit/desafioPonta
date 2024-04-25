@@ -22,8 +22,7 @@ using BNB.ProjetoReferencia.WebUI.Filters;
 using BNB.ProjetoReferencia.WebUI.Helpers.Erros;
 using BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Threading;
+using QRCoder;
 
 namespace BNB.ProjetoReferencia.WebUI.Controllers
 {
@@ -106,11 +105,9 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             try
             {
                 var eventoCriarCarteira = new DomainEvent<CriarCarteiraEvent>(new(viewModel.CPFOuCNPJ, viewModel.Quantidade.Value, viewModel.MatriculaSolicitante));
-                //var eventoAtualizarCliente = new DomainEvent<AtualizarClienteEvent>(new(viewModel.CPFOuCNPJ, viewModel.Endereco, viewModel.Telefone, viewModel.Email, viewModel.MatriculaSolicitante));
-
-                //var clienteAtualizado = await _atualizarClienteEventHandler.Handle(eventoAtualizarCliente, cancellationToken);
                 var novaCarteira = await _criarCarteiraEventHandler.Handle(eventoCriarCarteira, cancellationToken);
 
+                viewModel.Id = novaCarteira.Id;
                 ViewBag.SucessoInsercao = true;
                 return this.View(viewModel);
             }
@@ -162,7 +159,7 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
 
             cpfCnpj = Uri.UnescapeDataString(cpfCnpj);
             var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(cpfCnpj, cancellationToken);
-
+            
             var statusSaldo = _configuration["StatusSaldo"]!;
             var quantidadeAtual = carteiras.Where(x => statusSaldo.Split(";").Contains(x.Status)).Sum(y => y.QuantidadeIntegralizada);
 
@@ -194,7 +191,9 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
                 list.Add(newModel);
             }
 
-            JsonResult lobjJson = this.Json(list);
+            var oderedList = list.OrderByDescending(o => o.DataCriacao);
+
+            JsonResult lobjJson = this.Json(oderedList);
             return lobjJson;
         }
 
@@ -297,17 +296,23 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             return newModel;
         }
 
-        private async Task<List<ManifestoNewViewModel>> BuscarHistoricoInvestidor(string cpfCnpj, CancellationToken cancellationToken)
+        /// <summary>
+        /// Carrega os dados do PIX
+        /// </summary>
+        /// <param name="codigo">Codigo</param>
+        /// <returns>Json com dados do PIX</returns>
+        public JsonResult GerarPix(int codigo)
         {
-            var list = new List<ManifestoNewViewModel>();
-            //for (int i = 1; i <= 3; i++)
-            //{
-            //    var dados = BuscaDadosInvestidor(cpfCnpj);
-            //    dados.Id = i;
+            var carteira = _carteiraRepository.GetById(codigo);
+            if (carteira == null)
+                return this.Json(new { qrCodeBase64 = "" });
 
-            //    list.Add(dados);
-            //}
-            return list;
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(carteira.PixCopiaECola, QRCodeGenerator.ECCLevel.Q);
+            BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
+            string qrCodeBase64 = Convert.ToBase64String(qrCode.GetGraphic(10));
+
+            return this.Json(new { qrCodeBase64 = qrCodeBase64, pixCopiaCola = carteira.PixCopiaECola });
         }
 
         private void CarregarTiposPessoas()
