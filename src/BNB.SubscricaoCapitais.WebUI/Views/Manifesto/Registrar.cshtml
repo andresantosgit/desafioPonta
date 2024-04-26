@@ -83,32 +83,39 @@
                         {
                             <div class="ui form paddingTop8">
                                 @Html.AntiForgeryToken()
-                                <div class="fields">
-                                    <div class="field three wide required">
-                                        @Html.LabelFor(model => model.CPFOuCNPJ)
-                                        @Html.TextBoxFor(model => model.CPFOuCNPJ, new
-                                            {
-                                                @class = "control-input",
-                                                onkeyup = "mascara(this, mcnpj);",
-                                                @tabindex = "1"
-                                            })
+                                <div class="ui segment">
+                                    <div class="ui clearing segment basic clearing no-padding">
+                                        <h4 class="ui dividing header bdr-orange left"> Buscar Cliente </h4>
                                     </div>
-                                    <div class="align-items-end">
-                                        <div class="ui icon buttons">
-                                            <a class="ui button icon labeled bgm-orange-bnb" id="btn-consultar"><i class="search icon"></i>Pesquisar</a>
+                                    <div class="fields">
+                                        <div class="field ten wide required">
+                                            @Html.LabelFor(model => model.CPFOuCNPJ)
+                                            @Html.TextBoxFor(model => model.CPFOuCNPJ, new
+                                                {
+                                                    @class = "control-input",
+                                                    onkeyup = "mascara(this, mcnpj);",
+                                                    @tabindex = "1"
+                                                })
+                                        </div>
+                                    </div>
+                                    <div class="fields">
+                                        <div class="align-items-end">
+                                            <div class="ui icon buttons">
+                                                <a class="ui button icon labeled bgm-orange-bnb" id="btn-consultar"><i class="search icon"></i>Pesquisar</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="ui segment">
                                     <div class="ui clearing segment basic clearing no-padding">
-                                        <h4 class="ui dividing header bdr-orange left"> Dados do Cliente </h4>
+                                        <h4 class="ui dividing header bdr-orange left"> Dados do Cliente / Atualização Cadastral </h4>
                                     </div>
                                     <div class="fields">
-                                        <div class="field two wide required disabled" id="field_TipoPessoa">
+                                        <div class="field four wide required disabled" id="field_TipoPessoa">
                                             @Html.LabelFor(model => model.TipoPessoa)
                                             @Html.DropDownListFor(model => model.TipoPessoa, new SelectList(listaTipoPessoa, "Codigo", "Descricao"), new { @class = "control-dropdown", @tabindex = "2" })
                                         </div>
-                                        <div class="field eight wide required disabled" id="field_NomeInvestidor">
+                                        <div class="field twelve wide required disabled" id="field_NomeInvestidor">
                                             @Html.LabelFor(model => model.NomeInvestidor, htmlAttributes: new { @class = "control-label" })
                                             @Html.TextBoxFor(model => model.NomeInvestidor, new
                                                 {
@@ -117,7 +124,30 @@
                                                     @disabled = "disabled"
                                                 })
                                         </div>
-                                        <div class="field two wide required disabled" id="field_telefone">
+
+                                    </div>
+                                    <div class="fields">
+                                        <div class="field ten wide required disabled" id="field_endereco">
+                                            @Html.LabelFor(model => model.Endereco, htmlAttributes: new { @class = "control-label" })
+                                            @Html.TextBoxFor(model => model.Endereco, new
+                                                {
+                                                    @class = "control-input",
+                                                    @tabindex = "5",
+                                                    @disabled = "disabled"
+                                                })
+                                        </div>
+                                    </div>
+                                    <div class="fields">
+                                        <div class="field eight wide required disabled" id="field_email">
+                                            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
+                                            @Html.TextBoxFor(model => model.Email, new
+                                                {
+                                                    @class = "control-input",
+                                                    @tabindex = "6",
+                                                    @disabled = "disabled"
+                                                })
+                                        </div>
+                                        <div class="field eight wide required disabled" id="field_telefone">
                                             @Html.LabelFor(model => model.Telefone, htmlAttributes: new { @class = "control-label" })
                                             @Html.TextBoxFor(model => model.Telefone, new
                                                 {
@@ -128,106 +158,98 @@
                                         </div>
                                     </div>
                                     <div class="fields">
-                                        <div class="field five wide required disabled" id="field_endereco">
-                                            @Html.LabelFor(model => model.Endereco, htmlAttributes: new { @class = "control-label" })
-                                            @Html.TextBoxFor(model => model.Endereco, new
-                                                {
-                                                    @class = "control-input",
-                                                    @tabindex = "5",
-                                                    @disabled = "disabled"
-                                                })
-                                        </div>
-                                        <div class="field five wide required disabled" id="field_email">
-                                            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
-                                            @Html.TextBoxFor(model => model.Email, new
-                                                {
-                                                    @class = "control-input",
-                                                    @tabindex = "6",
-                                                    @disabled = "disabled"
-                                                })
-                                        </div>
-                                        <div class="align-items-end">
+                                        <div class="field align-items-end">
                                             <div class="ui icon buttons">
                                                 <a class="ui button icon labeled bgm-orange-bnb" id="btn-atualizarcliente"><i class="user icon"></i>Atualizar cliente</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="fields">
-                                    <div class="field three wide required disabled" id="field_TipoCustodia">
-                                        @Html.LabelFor(model => model.TipoCustodia)
-                                        @Html.DropDownListFor(model => model.TipoCustodia, new SelectList(listaTipoCustodia, "Codigo", "Descricao"), "Custódia Própria", new { @class = "control-dropdown", @tabindex = "7" })
+                                <div class="ui segment">
+                                    <div class="ui clearing segment basic clearing no-padding">
+                                        <h4 class="ui dividing header bdr-orange left"> Opções de Manifestação de Interesse </h4>
                                     </div>
-                                    <div class="field three wide required disabled" id="field_QuantidadeMaxima">
-                                        @Html.LabelFor(model => model.QuantidadeMaxima)
-                                        @Html.TextBoxFor(model => model.QuantidadeMaxima, new
-                                            {
-                                                @class = "control-input",
-                                                @tabindex = "7",
-                                                @type = "number",
-                                                @min = "1",
-                                                @disabled = "disabled"
-                                            })
+                                    <div class="fields">
+                                        <div class="field ten wide required disabled" id="field_TipoCustodia">
+                                            @Html.LabelFor(model => model.TipoCustodia)
+                                            @Html.DropDownListFor(model => model.TipoCustodia, new SelectList(listaTipoCustodia, "Codigo", "Descricao"), "Custódia Própria", new { @class = "control-dropdown", @tabindex = "7" })
+                                        </div>
+                                        <div class="field ten wide required disabled" id="field_QuantidadeMaxima">
+                                            @Html.LabelFor(model => model.QuantidadeMaxima)
+                                            @Html.TextBoxFor(model => model.QuantidadeMaxima, new
+                                                {
+                                                    @class = "control-input",
+                                                    @tabindex = "7",
+                                                    @type = "number",
+                                                    @min = "1",
+                                                    @disabled = "disabled"
+                                                })
+                                        </div>
+                                    </div>
+                                    <div class="fields">
+                                        <div class="field seven wide required disabled" id="field_quantidade">
+                                            @Html.LabelFor(model => model.Quantidade)
+                                            @Html.TextBoxFor(model => model.Quantidade, new
+                                                {
+                                                    @class = "control-input",
+                                                    @tabindex = "8",
+                                                    @type = "number",
+                                                    @min = 1,
+                                                    @max = 1,
+                                                    @disabled = "disabled"
+                                                })
+                                        </div>
+                                        <div class="field six wide required disabled">
+                                            @Html.LabelFor(model => model.ValorAcao, htmlAttributes: new { @class = "control-label" })
+                                            @Html.TextBoxFor(model => model.ValorAcao, "0", new
+                                                {
+                                                    @tabindex = "9",
+                                                    @class = "control-input currency",
+                                                    @onkeyup = "mascara(this, mmoeda);",
+                                                    @disabled = "disabled"
+                                                })
+                                        </div>
+                                        <div class="field six wide required disabled">
+                                            @Html.LabelFor(model => model.ValorTotal, htmlAttributes: new { @class = "control-label" })
+                                            @Html.TextBoxFor(model => model.ValorTotal, "0", new
+                                                {
+                                                    @tabindex = "10",
+                                                    @class = "control-input currency",
+                                                    @onkeyup = "mascara(this, mmoeda);",
+                                                    @disabled = "disabled"
+                                                })
+                                            @Html.HiddenFor(model => model.MatriculaSolicitante, null)
+                                        </div>
+                                    </div>
+
+                                    <div class="fields">
+                                        <a class="ui button bgm-gray-bnb" id="btn-limpar" onclick="LimparCamposButton()">Limpar campos</a>
+                                        <button class="ui button bgm-wine-bnb icon labeled" type="submit" id="save-button">
+                                            <i class="save icon"></i>
+                                            Manifestar interesse
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="fields" >
-                                    <div class="field three wide required disabled" id="field_quantidade">
-                                        @Html.LabelFor(model => model.Quantidade)
-                                        @Html.TextBoxFor(model => model.Quantidade, new
-                                            {
-                                                @class = "control-input",
-                                                @tabindex = "8",
-                                                @type = "number",
-                                                @min = 1,
-                                                @max = 1,
-                                                @disabled = "disabled"
-                                            })
-                                    </div>
-                                    <div class="field three wide required disabled">
-                                        @Html.LabelFor(model => model.ValorAcao, htmlAttributes: new { @class = "control-label" })
-                                        @Html.TextBoxFor(model => model.ValorAcao, "0", new
-                                            {
-                                                @tabindex = "9",
-                                                @class = "control-input currency",
-                                                @onkeyup = "mascara(this, mmoeda);",
-                                                @disabled = "disabled"
-                                            })
-                                    </div>
-                                    <div class="field three wide required disabled">
-                                        @Html.LabelFor(model => model.ValorTotal, htmlAttributes: new { @class = "control-label" })
-                                        @Html.TextBoxFor(model => model.ValorTotal, "0", new
-                                            {
-                                                @tabindex = "10",
-                                                @class = "control-input currency",
-                                                @onkeyup = "mascara(this, mmoeda);",
-                                                @disabled = "disabled"
-                                            })
-                                        @Html.HiddenFor(model => model.MatriculaSolicitante, null )
-                                    </div>
-                                </div>
-                                <div class="field right floated">
-                                    @* @Html.ActionLink("Cancelar", "Index", "Home", new { }, new { @class = "ui button bgm-gray-bnb" }) *@
-                                    <a class="ui button bgm-gray-bnb" id="btn-limpar" onclick="LimparCamposButton()">Limpar campos</a>
-                                    <button class="ui button bgm-wine-bnb icon labeled" type="submit" id="save-button">
-                                        <i class="save icon"></i>
-                                        Manifestar interesse
-                                    </button>
-                                </div>
-							</div>
+                            </div>
                         }
                     </div>
                     <div class="content">
                         <div class="field">
-                            <div class="field right floated" id="global-filter-demanda" name="global-filter-demanda" hidden>
-                                <div class="ui icon input">
-                                    <i class="search icon"></i>
-                                    <input type="text" id="globalFilterConsultarDemanda" onkeyup="javascript:forceLower(this);" placeholder="Digite para filtrar" size="50">
+                            <div class="ui segment">
+                                <div class="ui clearing segment basic clearing no-padding">
+                                    <h4 class="ui dividing header bdr-orange left"> Histórico</h4>
                                 </div>
-                            </div>
-                            <div id="listaManifestos"></div>
-                            <div class="field right floated elevated volume-demanda" id="volume-demanda" name="volume-demanda">
-                                <a class="ui button icon labeled bgm-orange-bnb" id="btnDownload" href="#" onclick="javascript:ExportarDados();"><i class="download icon"></i>Exportar Excel</a>
-                                <span class="ui larger" name="volumeManifestos" id="volumeManifestos"></span>
+                                <div class="field right floated" id="global-filter-demanda" name="global-filter-demanda" hidden>
+                                    <div class="ui icon input">
+                                        <i class="search icon"></i>
+                                        <input type="text" id="globalFilterConsultarDemanda" onkeyup="javascript:forceLower(this);" placeholder="Digite para filtrar" size="50">
+                                    </div>
+                                </div>
+                                <div id="listaManifestos"></div>
+                                <div class="field right floated elevated volume-demanda" id="volume-demanda" name="volume-demanda">
+                                    <a class="ui button icon labeled bgm-orange-bnb" id="btnDownload" href="#" onclick="javascript:GerarCarteirasCliente();"><i class="download icon"></i>Exportar Excel</a>
+                                    <span class="ui larger" name="volumeManifestos" id="volumeManifestos"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -237,7 +259,6 @@
     </div>
 </div>
 <div class="ui content">
-    
 </div>
 <div class="ui longer modal" id="PixDetalhe">
     <i class="close icon"></i>
@@ -248,13 +269,13 @@
             <h5 class="">Pix copia e cola:</h5>
             <p id="pixCopiaCola"></p>
             <h4 class="b container center aligned mb-5">
-                <a class="text-danger" href="" id="linkPixModalTermo">Para a conclusão do processo, clique aqui para baixar o termo e colher as assinaturas.</a>
+                <a class="text-danger" id="linkPixModalTermo">Para a conclusão do processo, baixe o <b>manifesto</b> clicando no botão abaixo e colha a assinatura do cliente.</a>
             </h4>
             <div class="ui icon buttons mr-1">
                 <a class="ui button icon labeled bgm-orange-bnb mr-1" id="btn-copyPix"><i class="copy icon"></i>Copiar PIX</a>
             </div>
             <div class="ui icon buttons">
-                <a class="ui button icon labeled bgm-wine-bnb" href="" id="btnPixModalTermo"><i class="download icon"></i>Baixar termo</a>
+                <a class="ui button icon labeled bgm-wine-bnb" id="btn-PixModalTermo"><i class="download icon"></i>Baixar termo</a>
             </div>
         </div>
         <br /><br />

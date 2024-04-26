@@ -226,7 +226,7 @@ public class CarteirasController : ControllerBase
         var documento = pdfGenerator.Generate(html, cancellationToken);
         var fileContentResult = new FileContentResult(documento, "application/octet-stream")
         {
-            FileDownloadName = $"{carteira.Id.ToString("D4")}Manifesto_{cliente.NomeAcionista}.pdf"
+            FileDownloadName = $"{carteira.Id.ToString("D4")}_Manifesto_{cliente.NomeAcionista}.pdf"
         };
         return fileContentResult;
     }
