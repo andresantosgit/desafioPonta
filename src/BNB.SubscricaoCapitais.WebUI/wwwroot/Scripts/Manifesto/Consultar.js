@@ -64,14 +64,14 @@ function ListarManifestos(cpfCnpj) {
                         field: 'actions', headerText: '', headerStyle: "width:15%", content: function (rowData) {
                             var btnPix = '<a onclick="popUpGerarPix(' + rowData.Id + ')" class="button default" data-tooltip="Gerar PIX"> <i class="money icon"></i></a>';
 
-                            var btnVisualizarDocumento = '<a class="button default highlight" data-tooltip="Visualizar Documento" href="#" onclick="javascript:GerarRelatorioDemanda(\'' + rowData.Codigo + '\');"><i class="ui file red pdf outline icon"></i></a>';
+                            var btnVisualizarDocumento = '<a onclick="GerarDocumento(' + rowData.Id + ')" class="button default highlight" data-tooltip="Visualizar Documento" href="#"><i class="ui file red pdf outline icon"></i></a>';
                             var btns = [];
 
                             if (rowData.Status == "ATIVA") {
                                 btns.push(btnPix);
                             }
 
-                            if (["ATIVA", "CONCLUÍDA"].indexOf(rowData.Status) > -1) {
+                            if (["ATIVA", "EXPIRADO"].indexOf(rowData.Status) > -1) {
                                 btns.push(btnVisualizarDocumento);
                             } 
 
@@ -138,7 +138,7 @@ function CorStatus(status, classNameAdicional) {
             classColor = "orange";
             break;
 
-        case "EXPIRADA":
+        case "EXPIRADO":
         case "VENCIDA":
             classColor = "gray";
             break;
@@ -219,51 +219,6 @@ function showModal(show) {
     }
 }
 
-//Gerar Excel e Fazer Download
-function ExportarDados() {
-
-    showModal(true);
-
-    var _parametro = {
-        Codigo: 0,
-        NumeroAnoDemanda: $('#Codigo').val() != "" ? $('#Codigo').val().substring(0, 2) : 0,
-        SequencialAnoDemanda: $('#Codigo').val() != "" ? $('#Codigo').val().substring(2, 6) : 0,
-        Status: $('#StatusDemandaAuditoria').val() || [],
-        DataCadastroFinal: $('#DataCadastroFinal').val(),
-        DataCadastroInicial: $('#DataCadastroInicial').val(),
-        DataAuditoriaFinal: $('#DataAuditoriaFinal').val(),
-        DataAuditoriaInicial: $('#DataAuditoriaInicial').val(),
-        DataAtendimentoFinal: $('#DataAtendimentoFinal').val(),
-        DataAtendimentoInicial: $('#DataAtendimentoInicial').val(),
-        NumeroDocumentoReferencia: $('#NumeroDocumentoReferencia').val(),
-        PalavraChave: $('#PalavraChave').val(),
-        NomeResponsavelAuditoria: $('#NomeResponsavelAuditoria').val(),
-        DemandanteAuditoriaCodigo: $('#DemandanteAuditoriaCodigo').val() || [],
-        TipoDemandaAuditoriaCodigo: $('#TipoDemandaAuditoriaCodigo').val() || [],
-        CanalDemandaAuditoriaCodigo: $('#CanalDemandaAuditoriaCodigo').val() || [],
-        GrupamentoResponsavelDemandaAuditoriaCodigo: $('#GrupamentoResponsavelDemandaAuditoriaCodigo').val() || []
-    }
-
-    $.ajax({
-        type: 'POST',
-        url: ROOT_URL + '/DemandaAuditoria/ExportarDemanda',
-        data: _parametro,
-        cache: true,
-        success: function (data) {
-            //Exportar planilha
-            $('.ui.modal').modal('hide');
-            window.location = ROOT_URL + '/Manifesto/DownloadExcel?fileGuid=' + data.FileGuid + '&fileName=' + data.FileName;
-            console.log(data.FileGuid)
-            console.log(data.FileName)
-        },
-        error: function (req, status, error) {
-            $('.ui.modal').modal('hide');;
-            $('#respostaAcaoFalha').text(error);
-            $('#modalErro').modal('show');
-        }
-    });
-}
-
 function popUpGerarPix(codigo) {
     $('#loadingModal').modal('show');
     $.ajax({
@@ -276,6 +231,9 @@ function popUpGerarPix(codigo) {
             var qrCodeBase64 = data.qrCodeBase64;
             $("#imgPix").prop('src', "data:image/jpg;base64," + qrCodeBase64);
             $("#pixCopiaCola").text(data.pixCopiaCola);
+            $("#btn-PixModalTermo").click(function () {
+                GerarDocumento(codigo);
+            });
 
             setTimeout(function () {
                 $('#PixDetalhe').modal({ closable: false }).modal('show');
@@ -289,6 +247,91 @@ function popUpGerarPix(codigo) {
 
         var textoMensagemErro = $('<p />')
             .text('Ocorreu um erro ao recuperar o PIX Qr Code.');
+
+        mensagemErro.append(textoMensagemErro);
+        $('#erros-validacao').html(mensagemErro);
+        setTimeout(function () {
+            $('#sucesso-execucao-ajax')
+                .transition('fade');
+        }, 5000);
+    });
+}
+
+function GerarDocumento(codigo) {
+
+    $.ajax({
+        type: 'GET',
+        url: ROOT_URL + '/Manifesto/GerarDocumento',
+        data: { 'codigo': codigo },
+        xhrFields: {
+            responseType: 'blob'
+        },
+    }).done(function (data) {
+        if (data !== undefined && data !== null) {
+
+            let carteiraId = codigo.toString().padStart(4, '0');
+            let nomeArquivo = `${carteiraId}_Manifesto.pdf`;
+
+            var url = window.URL.createObjectURL(data);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = nomeArquivo;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    }).fail(function (error) {
+        var mensagemErro = $('<div />')
+            .addClass('ui message visible negative .other-messages')
+            .prop('id', 'sucesso-execucao-ajax');
+
+        var textoMensagemErro = $('<p />')
+            .text('Ocorreu um erro ao recuperar o Documento.');
+
+        mensagemErro.append(textoMensagemErro);
+        $('#erros-validacao').html(mensagemErro);
+        setTimeout(function () {
+            $('#sucesso-execucao-ajax')
+                .transition('fade');
+        }, 5000);
+    });
+}
+
+function GerarCarteirasCliente() {
+
+    let idInvestidor = $("#CPFOuCNPJ").val();
+    $.ajax({
+        type: 'GET',
+        url: ROOT_URL + '/Manifesto/GerarRelatorioClienteCSV',
+        data:
+        {
+            'cliente': idInvestidor,
+        },
+        xhrFields: {
+            responseType: 'blob'
+        },
+    }).done(function (data) {
+        if (data !== undefined && data !== null) {
+
+            let nomeArquivo = `${idInvestidor}_Carteiras.csv`;
+
+            var url = window.URL.createObjectURL(data);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = nomeArquivo;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    }).fail(function (error) {
+        var mensagemErro = $('<div />')
+            .addClass('ui message visible negative .other-messages')
+            .prop('id', 'sucesso-execucao-ajax');
+
+        var textoMensagemErro = $('<p />')
+            .text('Ocorreu um erro ao recuperar o Carteiras.');
 
         mensagemErro.append(textoMensagemErro);
         $('#erros-validacao').html(mensagemErro);

@@ -17,12 +17,13 @@ using BNB.ProjetoReferencia.Core.Domain.Cliente.Events;
 using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Util;
-using BNB.ProjetoReferencia.Infrastructure.Database.SQLite.Repositories;
 using BNB.ProjetoReferencia.WebUI.Filters;
 using BNB.ProjetoReferencia.WebUI.Helpers.Erros;
 using BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto;
+using BNB.SubscricaoCapitais.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using QRCoder;
+using System.Text;
 
 namespace BNB.ProjetoReferencia.WebUI.Controllers
 {
@@ -41,6 +42,7 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
         private readonly IRequestHandler<DomainEvent<CriarCarteiraEvent>, CarteiraEntity> _criarCarteiraEventHandler;
         private readonly IRequestHandler<DomainEvent<AtualizarClienteEvent>, ClienteEntity> _atualizarClienteEventHandler;
         private readonly IConfiguration _configuration;
+        private readonly IPDFGenerator _pdfGenerator;
 
         /// <summary>
         /// Inicia uma nova instância da classe <see cref="ManifestoController"/> 
@@ -52,7 +54,8 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
                                    ICarteiraRepository carteiraRepository,
                                    IRequestHandler<DomainEvent<CriarCarteiraEvent>, CarteiraEntity> criarCarteiraEventHandler,
                                    IRequestHandler<DomainEvent<AtualizarClienteEvent>, ClienteEntity> atualizarClienteEventHandler,
-                                   IConfiguration configuration)
+                                   IConfiguration configuration,
+                                   IPDFGenerator pdfGenerator)
         {
             _logger = logger;
             _authService = authService;
@@ -61,6 +64,7 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             _criarCarteiraEventHandler = criarCarteiraEventHandler;
             _atualizarClienteEventHandler = atualizarClienteEventHandler;
             _configuration = configuration;
+            _pdfGenerator = pdfGenerator;
         }
 
         /// <summary>
@@ -129,9 +133,9 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             {
                 _logger.LogError(ex, "Erro de exceção.");
                 ViewBag.SucessoInsercao = false;
-            #if DEBUG
+#if DEBUG
                 ViewBag.TempError = string.Format("Message: {0}\nStackTrace: {1}", ex.Message, ex.StackTrace);
-            #endif
+#endif
                 return this.View(viewModel);
             }
         }
@@ -159,7 +163,7 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
 
             cpfCnpj = Uri.UnescapeDataString(cpfCnpj);
             var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(cpfCnpj, cancellationToken);
-            
+
             var statusSaldo = _configuration["StatusSaldo"]!;
             var quantidadeAtual = carteiras.Where(x => statusSaldo.Split(";").Contains(x.Status)).Sum(y => y.QuantidadeIntegralizada);
 
@@ -167,18 +171,18 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             .Select(x => x.IdInvestidor)
             .Distinct()
             .Select(x => _clienteRepository.FindByIdInvestidorAsync(x, cancellationToken).Result)
-            .ToArray();            
+            .ToArray();
 
             foreach (var carteira in carteiras)
             {
-                var cliente = clientesIdsInvestidor.FirstOrDefault(y => y.IdInvestidor == carteira.IdInvestidor);                
+                var cliente = clientesIdsInvestidor.FirstOrDefault(y => y.IdInvestidor == carteira.IdInvestidor);
 
                 var newModel = new ManifestoNewViewModel();
                 newModel.Id = carteira.Id;
                 newModel.MatriculaSolicitante = carteira.Matricula;
                 newModel.CPFOuCNPJ = carteira.IdInvestidor;
-                newModel.NomeInvestidor = cliente.NomeAcionista;                
-                newModel.TipoPessoa = cliente.TipoPessoa == "Física" ? 1 : 2;                
+                newModel.NomeInvestidor = cliente.NomeAcionista;
+                newModel.TipoPessoa = cliente.TipoPessoa == "Física" ? 1 : 2;
                 newModel.ValorAcao = carteira.ValorUnitarioPorAcao;
                 newModel.QuantidadeMaxima = cliente.DireitoSubscricao - quantidadeAtual;
                 newModel.Status = carteira.Status;
@@ -215,11 +219,11 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
                 this.TempData["Success"] = false;
                 return NotFound(model);
             }
-            
+
             var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(cpfCnpj, cancellationToken);
             var statusSaldo = _configuration["StatusSaldo"]!;
             var quantidadeAtual = carteiras.Where(x => statusSaldo.Split(";").Contains(x.Status)).Sum(y => y.QuantidadeIntegralizada);
-                
+
             var newModel = new ManifestoNewViewModel();
             newModel.MatriculaSolicitante = _authService.Matricula;
             newModel.CPFOuCNPJ = cpfCnpj;
@@ -315,6 +319,70 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             return this.Json(new { qrCodeBase64 = qrCodeBase64, pixCopiaCola = carteira.PixCopiaECola });
         }
 
+        public async Task<ActionResult> GerarDocumento(int codigo, CancellationToken cancellationToken)
+        {
+            var carteira = _carteiraRepository.GetById(codigo);
+            if (carteira is null)
+                return NoContent();
+
+            var cliente = await _clienteRepository.FindByIdInvestidorAsync(carteira.IdInvestidor, cancellationToken);
+            if (cliente is null)
+                return NoContent();
+
+            var html = (await System.IO.File.ReadAllTextAsync("./manifesto.html"))
+                .Replace("{Identificador}", carteira.IdInvestidor)
+                .Replace("{Nome}", cliente.NomeAcionista)
+                .Replace("{Endereco}", cliente.Endereco)
+                .Replace("{Email}", cliente.Email)
+                .Replace("{Telefone}", cliente.Telefone)
+                .Replace("{QuantidadeTotal}", cliente.DireitoSubscricao.ToString())
+                .Replace("{QuantidadeManifestada}", carteira.QuantidadeIntegralizada.ToString())
+            .Replace("{QuantidadeManifestadaValor}", carteira.ValorTotal.ToString())
+            ;
+
+            var documento = _pdfGenerator.Generate(html, cancellationToken);
+            var fileContentResult = new FileContentResult(documento, "application/octet-stream")
+            {
+                FileDownloadName = $"{carteira.Id.ToString("D4")}_Manifesto_{cliente.NomeAcionista}.pdf"
+            };
+            return fileContentResult;
+        }
+
+        public async Task<ActionResult> GerarRelatorioClienteCSV(string cliente, string? status, CancellationToken cancellationToken)
+        {
+            var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(cliente, cancellationToken);
+            if (!carteiras.Any())
+                return NoContent();
+
+            if (!string.IsNullOrWhiteSpace(status))
+                carteiras = carteiras.Where(x => x.Status.Equals(status, StringComparison.InvariantCultureIgnoreCase)).ToList();
+
+            var clientesIdsInvestidor = carteiras
+                .Select(x => x.IdInvestidor)
+                .Distinct()
+                .Select(x => _clienteRepository.FindByIdInvestidorAsync(x, cancellationToken).Result)
+                .ToArray();
+
+            var carteiraClientes = carteiras.Select(x => CriarModelo(x, clientesIdsInvestidor.FirstOrDefault(y => y.IdInvestidor == x.IdInvestidor))).ToList();
+
+            using (var memoryStream = new MemoryStream())
+            using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+            {
+                streamWriter.WriteLine($"{nameof(CarteiraModel.Id)};{nameof(CarteiraModel.IdInvestidor)};{nameof(CarteiraModel.NomeAcionista)};{nameof(CarteiraModel.TipoPessoa)};{nameof(CarteiraModel.TxId)};{nameof(CarteiraModel.DataCriacao)};{nameof(CarteiraModel.DataAtualizacao)};{nameof(CarteiraModel.QuantidadeIntegralizada)};{nameof(CarteiraModel.ValorUnitarioPorAcao)};{nameof(CarteiraModel.ValorTotal)};{nameof(CarteiraModel.Status)};{nameof(CarteiraModel.PixCopiaECola)}");
+                foreach (var carteira in carteiraClientes)
+                    streamWriter.WriteLine($"{carteira.Id};{carteira.IdInvestidor};{carteira.NomeAcionista};{carteira.TipoPessoa};{carteira.TxId};{carteira.DataCriacao};{carteira.DataAtualizacao};{carteira.QuantidadeIntegralizada};{carteira.ValorUnitarioPorAcao};{carteira.ValorTotal};{carteira.Status};{carteira.PixCopiaECola}");
+
+                streamWriter.Flush();
+                memoryStream.Position = 0;
+                var fileContentResult = new FileContentResult(memoryStream.ToArray(), "application/octet-stream")
+                {
+                    FileDownloadName = $"RelatorioGlobal.csv"
+                };
+                return fileContentResult;
+            }
+        }
+
+
         private void CarregarTiposPessoas()
         {
             var tiposPessoas = new List<TipoPessoa>();
@@ -332,6 +400,8 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
 
             this.ViewData["TiposCustodias"] = tiposCustodias;
         }
+
+        private CarteiraModel CriarModelo(CarteiraEntity carteira, ClienteEntity? cliente = null) => new(this, carteira, cliente);
 
     }
 }
