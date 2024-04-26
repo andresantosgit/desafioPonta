@@ -119,7 +119,7 @@ app.UseHttpsRedirection();
 
 //app.UseBNBAuthBearer();
 
-//app.UseAuthorization();
+app.UseAuthorization();
 
 app.MapControllers();
 
