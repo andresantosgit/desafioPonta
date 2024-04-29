@@ -33,18 +33,11 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
 
             Item items = JsonConvert.DeserializeObject<Item>(json);
 
-            //var result = await _httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-            //{
-            //    Address = $"{items.EnderecoSeguranca}realms/{items.Ambiente}/protocol/openid-connect/token",
-            //    ClientId = items.ClientId,
-            //    ClientSecret = items.Credenciais.Secret
-            //});
-
             var result = await _httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
-                Address = "https://sso.dreads.bnb/auth/realms/Desenv/protocol/openid-connect/token",
-                ClientId = "s493-backend-subscricao-servico",
-                ClientSecret = "e6cde745-05c8-4490-8bdd-99589bea52b5"
+                Address = $"{items.EnderecoSeguranca}realms/{items.Ambiente}/protocol/openid-connect/token",
+                ClientId = items.ClientId,
+                ClientSecret = items.Credenciais.Secret
             });
 
             return result.AccessToken;
