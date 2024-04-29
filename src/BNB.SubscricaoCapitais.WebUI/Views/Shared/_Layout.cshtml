@@ -174,8 +174,7 @@
                 /[0-9]/.test(String.fromCharCode(e.which));
         });
 
-        //var ROOT_URL = "string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~"))"
-        var ROOT_URL = "@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Url.Content("~")}")"
+        var ROOT_URL = "@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}")"
 
         function ConvertDate(date) {
             var date = date;
