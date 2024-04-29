@@ -30,8 +30,13 @@ core.ignore.recursive= \
 	{obj} \
 	{packages} \
 	{.vs} \
+	{.git} \
+	{.github} \
+	{.jazzignore} \
 	{*.suo} \
 	{.project} 
 
 core.ignore= \
-	{.project} 
+	{.project} \
+	{.gitignore} 
+	
