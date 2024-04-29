@@ -63,7 +63,7 @@ builder.Services.AddSwaggerGen(c =>
     //});
 });
 
-//builder.Services.AddBNBAuthBearer();
+builder.Services.AddBNBAuthBearer();
 
 // É usada para adicionar um filtro global ao pipeline do MVC em uma aplicação ASP.NET Core.
 // Esse filtro será aplicado a todas as ações de todos os controladores, proporcionando uma
@@ -117,9 +117,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//app.UseBNBAuthBearer();
+app.UseBNBAuthBearer();
 
-//app.UseAuthorization();
+app.UseAuthorization();
 
 app.MapControllers();
 

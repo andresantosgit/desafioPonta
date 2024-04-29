@@ -3,7 +3,7 @@
   "auth-server-url": "https://sso.dreads.bnb/auth/",
   "ssl-required": "external",
   "resource": "s493-backend-subscricao-servico",
-  "verify-token-audience": true,
+  "verify-token-audience": false,
   "credentials": {
     "secret": "e6cde745-05c8-4490-8bdd-99589bea52b5"
   },

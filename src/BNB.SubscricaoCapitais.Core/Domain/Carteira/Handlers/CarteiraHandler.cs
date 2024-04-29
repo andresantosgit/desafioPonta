@@ -8,6 +8,7 @@ using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic;
 
 namespace BNB.ProjetoReferencia.Core.Domain.Carteira.Handlers;
 
@@ -173,6 +174,7 @@ public class CarteiraHandler :
         var carteira = carteiras.FirstOrDefault(x => x.Id == @event.Model.Id);
 
         carteira!.Status = @event.Model.Status;
+        carteira!.DataAtualizacao = DateTime.Now;
 
         var carteiraAtualizada = _carteiraRepository.Update(carteira);
         await _carteiraRepository.SaveAsync(cancellationToken);
