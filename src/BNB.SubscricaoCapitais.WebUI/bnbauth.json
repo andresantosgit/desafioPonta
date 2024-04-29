@@ -2,11 +2,9 @@
   "realm": "Desenv",
   "auth-server-url": "https://sso.dreads.bnb/auth/",
   "ssl-required": "external",
-  "resource": "sPOC-SSO_MVCSample-servico",
-  "verify-token-audience": true,
+  "resource": "s493-subscricaocapitais-servico",
   "credentials": {
-    "secret": "17d81ec8-e281-47fc-8e47-687def20af82"
+    "secret": "16ab8f81-9869-4a74-aef5-534ec07d75cf"
   },
-  "confidential-port": 0,
-  "policy-enforcer": {}
+  "confidential-port": 0
 }

@@ -18,8 +18,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddBNBAuth(options =>
+builder.Services.AddBNBAuthISKey(options =>
 {
+    options.KeycloakResourceFile = BNBAuthDefaults.KeycloakResourceFile;
+    options.ISKeyUrl = "http://s2iisg01.dreads.bnb:8076/BN.S267.Autorizador";
+    options.ISKeySiglaSistema = "493SUBCAP";
     options.ISKeyFilterEnabled = false;
 });
 
@@ -68,6 +71,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.UseBNBAuth();
+app.UseBNBAuthISKey();
 
 app.Run();
