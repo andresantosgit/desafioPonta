@@ -41,7 +41,9 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 
 // Configura o Http
 builder.Services.ConfigureHttp(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 
 // Configura os serviços da infraestrutura
