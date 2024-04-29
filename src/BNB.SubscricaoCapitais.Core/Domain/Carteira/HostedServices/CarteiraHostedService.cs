@@ -43,7 +43,7 @@ public class CarteiraHostedService : IHostedService
 
                     foreach (var carteira in carteiras)
                     {
-                        if(new DateTime(carteira.DataCriacao.Year, carteira.DataCriacao.Month, carteira.DataCriacao.Day, 23, 59, 59) <= DateTime.Now)
+                        if(new DateTime(carteira.DataCriacao.Year, carteira.DataCriacao.Month, carteira.DataCriacao.Day, 23, 59, 59) < DateTime.Now)
                         {
                             var evento = new DomainEvent<AtualizarCarteiraEvent>(new(carteira.Id, carteira.IdInvestidor, "EXPIRADO"));
                             await atualizarCarteiraEventHandler.Handle(evento, cancellationToken);
