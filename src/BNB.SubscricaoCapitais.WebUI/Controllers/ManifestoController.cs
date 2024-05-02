@@ -22,6 +22,7 @@ using BNB.ProjetoReferencia.WebUI.Helpers.Erros;
 using BNB.ProjetoReferencia.WebUI.ViewModel.Views.Manifesto;
 using BNB.SubscricaoCapitais.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using QRCoder;
 using System.Text;
 
@@ -32,39 +33,35 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
     /// </summary>
     public class ManifestoController : BaseController
     {
-        /// <summary>
-        /// Logger Service
-        /// </summary>
         private readonly ILogger<ManifestoController> _logger;
-        private readonly IAuthService _authService;
         private readonly IClienteRepository _clienteRepository;
         private readonly ICarteiraRepository _carteiraRepository;
         private readonly IRequestHandler<DomainEvent<CriarCarteiraEvent>, CarteiraEntity> _criarCarteiraEventHandler;
         private readonly IRequestHandler<DomainEvent<AtualizarClienteEvent>, ClienteEntity> _atualizarClienteEventHandler;
         private readonly IConfiguration _configuration;
         private readonly IPDFGenerator _pdfGenerator;
+        private readonly IAuthService _authService;
 
         /// <summary>
         /// Inicia uma nova instância da classe <see cref="ManifestoController"/> 
         /// </summary>
-        /// <param name="logger">Name = "Logger Service"</param>
         public ManifestoController(ILogger<ManifestoController> logger,
-                                   IAuthService authService,
                                    IClienteRepository clienteRepository,
                                    ICarteiraRepository carteiraRepository,
                                    IRequestHandler<DomainEvent<CriarCarteiraEvent>, CarteiraEntity> criarCarteiraEventHandler,
                                    IRequestHandler<DomainEvent<AtualizarClienteEvent>, ClienteEntity> atualizarClienteEventHandler,
                                    IConfiguration configuration,
-                                   IPDFGenerator pdfGenerator)
+                                   IPDFGenerator pdfGenerator, 
+                                   IAuthService authService)
         {
             _logger = logger;
-            _authService = authService;
             _clienteRepository = clienteRepository;
             _carteiraRepository = carteiraRepository;
             _criarCarteiraEventHandler = criarCarteiraEventHandler;
             _atualizarClienteEventHandler = atualizarClienteEventHandler;
             _configuration = configuration;
             _pdfGenerator = pdfGenerator;
+            _authService = authService;
         }
 
         /// <summary>
@@ -80,6 +77,8 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
 
                 var newModel = new ManifestoNewViewModel();
                 newModel.MatriculaSolicitante = _authService.Matricula;
+
+                ViewBag.Colaborador = _authService.GetCredencial();
 
                 return this.View(newModel);
             }
@@ -105,6 +104,8 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
 
             this.CarregarTiposPessoas();
             this.CarregarTiposCustodias();
+
+            ViewBag.Colaborador = _authService.GetCredencial();
 
             try
             {
@@ -148,6 +149,7 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
         {
             try
             {
+                ViewBag.Colaborador = _authService.GetCredencial();
                 return this.View();
             }
             catch (Exception ex)
@@ -160,9 +162,17 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
         public async Task<ActionResult> ListaManifestos(string cpfCnpj, CancellationToken cancellationToken)
         {
             var list = new List<ManifestoNewViewModel>();
+            List<CarteiraEntity> carteiras;
 
-            cpfCnpj = Uri.UnescapeDataString(cpfCnpj);
-            var carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(cpfCnpj, cancellationToken);
+            if (cpfCnpj.IsNullOrEmpty())
+            {
+                carteiras = await _carteiraRepository.FindAllAsync(cancellationToken);
+            }
+            else
+            {
+                cpfCnpj = Uri.UnescapeDataString(cpfCnpj);
+                carteiras = await _carteiraRepository.FindAllByIdInvestidorAsync(cpfCnpj, cancellationToken);
+            }
 
             var statusSaldo = _configuration["StatusSaldo"]!;
             var quantidadeAtual = carteiras.Where(x => statusSaldo.Split(";").Contains(x.Status)).Sum(y => y.QuantidadeIntegralizada);

@@ -15,6 +15,7 @@ using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities;
 using BNB.ProjetoReferencia.WebUI.Filters;
 using BNB.ProjetoReferencia.WebUI.ViewModel.Util.Mensagens;
+using BNB.ProjetoReferencia.WebUI.Controllers;
 
 namespace BNB.ProjetoReferencia.WebUI
 {
@@ -29,39 +30,9 @@ namespace BNB.ProjetoReferencia.WebUI
         /// </summary>
         private ILogger<BaseController> _logger;
 
-        /// <summary>
-        /// Auto Mapper Service
-        /// </summary>
-        private IMapper _mapper;
-
-        /// <summary>
-        /// Autorizador Service
-        /// </summary>
-        private IAuthService _autorizadorService;
-
         protected ILogger<BaseController> Logger => _logger ?? (_logger = HttpContext.RequestServices?.GetService<ILogger<BaseController>>());
         
-        protected IMapper Mapper => _mapper ?? (_mapper = HttpContext?.RequestServices?.GetService<IMapper>());
-        
-        protected IAuthService AutorizadorService => _autorizadorService ?? (_autorizadorService = HttpContext.RequestServices?.GetService<IAuthService>());
-        
         protected ISession Session => HttpContext.Session;
-
-        /// <summary>
-        /// Colaborador logado.
-        /// </summary>
-        /// <value>Objeto ColaboradorBNBViewModel.</value>
-        protected ICredencial Colaborador
-        {
-            get
-            {
-                return new Credencial
-                {
-                    Matricula = AutorizadorService.Matricula,
-                    Nome = AutorizadorService.NomeCompleto
-                };
-            }
-        }
 
         /// <summary>
         /// Creates a System.Web.Mvc.JsonResult object that serializes the specified object
@@ -78,15 +49,6 @@ namespace BNB.ProjetoReferencia.WebUI
             //return Ok(data);
 
             return new JsonResult(data, new JsonSerializerOptions());
-
-            //return new JsonResult( data,
-            //    new JsonSerializerSettings());
-
-            //return new JsonResult()
-            //{
-            //    Data = data,
-            //    MaxJsonLength = int.MaxValue
-            //};
         }
 
         /// <summary>
@@ -101,27 +63,8 @@ namespace BNB.ProjetoReferencia.WebUI
         /// </returns>
         protected JsonResult JsonDeny(object data)
         {
-            //return new JsonResult(data);
-
-            //return new JsonResult(data);
             return new JsonResult(data, new JsonSerializerOptions());
-
-            //return new JsonResult()
-            //{
-            //    Data = data,
-            //    MaxJsonLength = int.MaxValue
-            //};
         }
-
-        /// <summary>
-        /// Credencial do Usuário Logado
-        /// </summary>
-        /// <value> A propriedade Credencial recupera a credencial do usuário logado.</value>
-        public Credencial Credencial => new Credencial()
-        {
-            Matricula = AutorizadorService.Matricula,
-            Nome = AutorizadorService.NomeCompleto
-        };
 
         /// <summary>
         /// Copia os dados entre objetos.
@@ -143,21 +86,6 @@ namespace BNB.ProjetoReferencia.WebUI
                     prop.SetValue(target, value, null);
                 }
             }
-        }
-
-        /// <summary>
-        /// Mapear mudança das entidades.
-        /// </summary>
-        /// <typeparam name="T">Tipo do objeto.</typeparam>
-        /// <param name="originalEntity">Objeto original.</param>
-        /// <param name="model">Objeto destino.</param>
-        /// <returns>Entidade mapeada.</returns>
-        public T MapChangesEntity<T>(T originalEntity, object model)
-        {
-            T defaultEntity = default(T);
-            this.CopyValues<T>(defaultEntity, originalEntity);
-            T mapped = Mapper.Map(model, originalEntity);
-            return mapped;
         }
 
         /// <summary>

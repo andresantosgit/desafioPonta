@@ -10,8 +10,10 @@ $(document).ready(function () {
         e.preventDefault();
         var cpfCnpj = $('#CPFOuCNPJ').val();
 
-        ConsultarDados(cpfCnpj);
-        ConsultarManifestos(cpfCnpj);
+        if (cpfCnpj) {
+            ConsultarDados(cpfCnpj);
+            ConsultarManifestos(cpfCnpj);
+        }
     });
 
     $('#Quantidade').on('change', function (e) {
@@ -29,12 +31,6 @@ function AtualizarCliente() {
     var model = $("form").serialize();
     var cpfCnpj = $('#CPFOuCNPJ').val();
     if (cpfCnpj) {
-        $('.ui.modal')
-            .modal({
-                closable: false
-            })
-            .modal('show');
-
         $.ajax({
             type: 'POST',
             url: ROOT_URL + '/Manifesto/AtualizarCliente',

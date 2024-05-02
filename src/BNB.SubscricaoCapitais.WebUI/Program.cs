@@ -29,11 +29,8 @@ builder.Services.AddBNBAuthISKey(options =>
 //IMapper mapper = AutoMapperConfig.GetMapperConfig().CreateMapper();
 //builder.Services.AddSingleton(mapper);
 
-builder.Services.AddScoped<IAuthService, AuthService>();
-
 // Filters
 builder.Services.AddScoped<SegurancaAutorizaActionFilter>();
-//builder.Services.AddScoped<ExceptionActionFilter>();
 builder.Services.AddScoped<Validate>();
 
 // Configura a Database
@@ -42,6 +39,7 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 // Configura o Http
 builder.Services.ConfigureHttp(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
@@ -49,8 +47,15 @@ builder.Services.AddSingleton<ITokenService, TokenService>();
 // Configura os serviços da infraestrutura
 builder.Services.AddInfrastructure();
 
+builder.Services.AddRouting(options =>
+{
+    options.AppendTrailingSlash = true;
+});
+
 // Adiciona os serviços do Core
 builder.Services.AddCore();
+
+builder.Services.AddMvc(options => options.EnableEndpointRouting = false);
 
 var app = builder.Build();
 
@@ -65,14 +70,12 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.MapDefaultControllerRoute();
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
 app.UseBNBAuthISKey();
+app.UseMvc();
 
 app.Run();
