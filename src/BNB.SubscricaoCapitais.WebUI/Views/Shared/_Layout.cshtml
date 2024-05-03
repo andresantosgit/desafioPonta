@@ -76,8 +76,14 @@
                 </a>
                 <div class="content">
                     <div class="ui vertical text menu">
-                        <a href="@Url.Action("Registrar", "Manifesto")" class="item">Manifestar interesse</a>
-                        <a href="@Url.Action("Consultar", "Manifesto")" class="item">Consultar</a>
+                        @if (ViewBag.Colaborador.PossuiPermissaoMenuRegistrar)
+                        {
+                            <a href="@Url.Action("Registrar", "Manifesto")" class="item">Manifestar interesse</a>
+                        }
+                        @if (ViewBag.Colaborador.PossuiPermissaoMenuConsultar)
+                        {
+                            <a href="@Url.Action("Consultar", "Manifesto")" class="item">Consultar</a>
+                        }
                     </div>
                 </div>
             </div>

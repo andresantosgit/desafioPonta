@@ -35,5 +35,17 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
         /// <value>Email</value>
         public string? Email { get; set; }
 
+        /// <summary>
+        /// Possui permissão para o menu registrar
+        /// </summary>
+        /// <value>PossuiPermissaoMenuRegistrar</value>
+        public bool? PossuiPermissaoMenuRegistrar { get; set; }
+
+        /// <summary>
+        /// Possui permissão para o menu consultar
+        /// </summary>
+        /// <value>PossuiPermissaoMenuConsultar</value>
+        public bool? PossuiPermissaoMenuConsultar { get; set; }
+
     }
 }

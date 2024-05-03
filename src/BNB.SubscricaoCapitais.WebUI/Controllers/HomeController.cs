@@ -37,5 +37,15 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
             _authService.Logout(this.HttpContext.Request);
             return this.RedirectToAction("Index", "Home");
         }
+
+        /// <summary>
+        /// Acesso negado View
+        /// </summary>
+        /// <returns>Retorna a view de acesso negado</returns>
+        public ActionResult AcessoNegado()
+        {
+            ViewBag.Colaborador = _authService.GetCredencial();
+            return this.View();
+        }
     }
 }

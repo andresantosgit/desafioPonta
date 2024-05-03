@@ -23,11 +23,7 @@ builder.Services.AddBNBAuthISKey(options =>
     options.KeycloakResourceFile = BNBAuthDefaults.KeycloakResourceFile;
     options.ISKeyUrl = "http://s2iisg01.dreads.bnb:8076/BN.S267.Autorizador";
     options.ISKeySiglaSistema = "493SUBCAP";
-    options.ISKeyFilterEnabled = false;
 });
-
-//IMapper mapper = AutoMapperConfig.GetMapperConfig().CreateMapper();
-//builder.Services.AddSingleton(mapper);
 
 // Filters
 builder.Services.AddScoped<SegurancaAutorizaActionFilter>();
