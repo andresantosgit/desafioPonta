@@ -43,6 +43,13 @@ public class CarteiraHostedService : IHostedService
 
                     foreach (var carteira in carteiras)
                     {
+                        var eventoLog = new DomainEvent<AtualizarCarteiraEvent>(new(
+                                carteira.Id,
+                                carteira.IdInvestidor,
+                                carteira.Status));
+
+                        await atualizarCarteiraEventHandler.Handle(eventoLog, cancellationToken);
+
                         var retornoCobranca = await cobrancaRepository.GetByTxId(carteira.TxId, cancellationToken);
                         if (retornoCobranca != null && retornoCobranca.TxId != null && retornoCobranca.Status != null)
                         {

@@ -141,7 +141,7 @@ function CorStatus(status, classNameAdicional) {
             classColor = "gray";
             break;
 
-        case "CONCLUÍDA":
+        case "CONCLUIDA":
             classColor = "green";
             break;
 
