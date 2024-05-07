@@ -1,10 +1,5 @@
 ﻿@using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces
 @using BNB.ProjetoReferencia.WebUI.Helpers
-@inject IAuthService AuthService
-
-@{
-    var usuarioLogado = AuthService.GetCredencial();
-}
 
 <!DOCTYPE html>
 <html>
@@ -54,10 +49,10 @@
                     <div class="ui dropdown pointing top right item">
                         <i class="user circle large icon"></i>
                         <div class="menu">
-                            <a class="item"><i class="user icon"></i> @Html.Raw($"{usuarioLogado.Nome} - {usuarioLogado.Matricula.ToUpper()}")</a>
+                            <a class="item"><i class="user icon"></i> @Html.Raw($"{ViewBag.Colaborador.Nome} - {ViewBag.Colaborador.Matricula.ToUpper()}")</a>
                             <a class="item"><i class="building outline icon"></i> BANCO DO NORDESTE</a>
-                            <a class="item"><i class="address card outline icon"></i> @Html.Raw($"{usuarioLogado.Email}")</a>
-                            <a class="item" id="logout_action" href="/Home/Logout"><i class="close icon"></i>SAIR</a>
+                            <a class="item"><i class="address card outline icon"></i> @Html.Raw($"{ViewBag.Colaborador.Email}")</a>
+                            <a class="item" id="logout_action" href="@Url.Action("Logout", "Home")"><i class="close icon"></i>SAIR</a>
 
                         </div>
                     </div>
@@ -81,8 +76,14 @@
                 </a>
                 <div class="content">
                     <div class="ui vertical text menu">
-                        <a href="@Url.Action("Registrar", "Manifesto")" class="item">Manifestar interesse</a>
-                        <a href="@Url.Action("Consultar", "Manifesto")" class="item">Consultar</a>
+                        @if (ViewBag.Colaborador.PossuiPermissaoMenuRegistrar)
+                        {
+                            <a href="@Url.Action("Registrar", "Manifesto")" class="item">Manifestar interesse</a>
+                        }
+                        @if (ViewBag.Colaborador.PossuiPermissaoMenuConsultar)
+                        {
+                            <a href="@Url.Action("Consultar", "Manifesto")" class="item">Consultar</a>
+                        }
                     </div>
                 </div>
             </div>
@@ -174,8 +175,7 @@
                 /[0-9]/.test(String.fromCharCode(e.which));
         });
 
-        //var ROOT_URL = "string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~"))"
-        var ROOT_URL = "@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Url.Content("~")}")"
+        var ROOT_URL = "@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}")"
 
         function ConvertDate(date) {
             var date = date;

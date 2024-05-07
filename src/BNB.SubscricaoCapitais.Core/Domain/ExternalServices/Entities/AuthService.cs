@@ -67,14 +67,12 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
 
         public bool HasPermission(string recurso, string? acao)
         {
-            return true;
-            //return _usuarioLogado.HasPermission(recurso, acao);// .usuarioPossuiLimitanteAsync(this.Matricula, Constantes.CodigoSistema, recurso, acao ?? string.Empty);            
+            return _usuarioLogado.HasPermission(recurso, acao);
         }
 
         public bool HasPermission(string recurso)
         {
-            return true;
-            //return _usuarioLogado.HasPermission(Constantes.CodigoSistema, recurso);
+            return _usuarioLogado.HasPermission(recurso, null);
         }
 
         public void Logout(HttpRequest request)
@@ -84,8 +82,7 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
 
         public bool PossuiLimitanteGlobal(string identificadorLimitante)
         {
-            return true;
-            //return _usuarioLogado.HasPermission(Constantes.CodigoSistema, identificadorLimitante);
+            return _usuarioLogado.HasPermission(Constantes.CodigoSistema, identificadorLimitante);
         }
 
         public ICredencial GetCredencial()
@@ -94,7 +91,9 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
             {
                 Matricula = this.Matricula,
                 Nome = this.NomeCompleto,
-                Email = this.Email
+                Email = this.Email,
+                PossuiPermissaoMenuRegistrar = this.HasPermission("Manifesto/Registrar"),
+                PossuiPermissaoMenuConsultar = this.HasPermission("Manifesto/Consultar")
             };
         }
 

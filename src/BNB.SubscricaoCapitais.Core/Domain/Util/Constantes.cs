@@ -19,6 +19,6 @@ namespace BNB.ProjetoReferencia.Core.Domain.Util
         /// <summary>
         /// Código do Sistema
         /// </summary>
-        public const string CodigoSistema = "S493";
+        public const string CodigoSistema = "493SUBCAP";
     }
 }

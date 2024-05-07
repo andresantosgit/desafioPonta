@@ -23,7 +23,7 @@ public class CarteiraRepository : BaseRepository<CarteiraEntity, int>, ICarteira
     public async Task<List<CarteiraEntity>> FindAllAsync(CancellationToken cancellationToken)
         => await _context.Set.ToListAsync(cancellationToken);
 
-    public async Task<List<CarteiraEntity>> FindAllByStatusAndDateAsync(string status, CancellationToken cancellationToken)
+    public async Task<List<CarteiraEntity>> FindAllByStatusAsync(string status, CancellationToken cancellationToken)
         => await _context.Set        
         .Where(x=> x.Status == status)        
         .ToListAsync(cancellationToken);

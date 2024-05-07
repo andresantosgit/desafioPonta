@@ -9,7 +9,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
 
@@ -27,15 +26,12 @@ public class SegurancaAutorizaActionFilter : ActionFilterAttribute, IAsyncAction
 
     private readonly IAuthService _authService;
 
-    //private readonly IMapper _mapper;
-
     public SegurancaAutorizaActionFilter(
                 ILogger<SegurancaAutorizaActionFilter> logger,
                 IAuthService authService)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
-        //_mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _logger = logger;
+        _authService = authService;
     }
 
     /// <summary>
@@ -54,35 +50,18 @@ public class SegurancaAutorizaActionFilter : ActionFilterAttribute, IAsyncAction
                 AcessoNegado(filtroContexto, "(Erro na inicialização dos parâmetros de segurança.)");
             }
 
-            string lstrIP = "";
-            if (filtroContexto.HttpContext.Connection.RemoteIpAddress != null)
-            {
-                lstrIP = filtroContexto.HttpContext.Connection.RemoteIpAddress.ToString();
-            }
-
-            //string lstrIP = filtroContexto.HttpContext.Request.UserHostAddress;                
-
-            // USAR PARA CADASTRO NO S267-ISKEY
-            //Debug.WriteLine(string.Format("{0}:{1}:{2}:{3}", lstrController, lstrAction, lstrIP, ldatDateTime.ToLongDateString()));
-            Debug.WriteLine(string.Format("{0}:{1}:{2}", lstrController, lstrAction, lstrIP));
-
-            //SetColaboradorLogado(filtroContexto);
-            //var colaborador = _globalVariablesService.GetColaboradorViewModel();
+            Debug.WriteLine(string.Format("{0}/{1}", lstrController, lstrAction));
 
             string matricula =_authService.Matricula;
-
-            //  (colaborador != null) ? colaborador.Matricula : 
-
-            // CHECA SE USUARIO POSSUI PERMISSAO NA APLICACAO (CONTROLLER:ACTION)
-            string lstrAplicacao = string.Format("{0}:{1}", lstrController, lstrAction);            
+            string lstrAplicacao = string.Format("{0}/{1}", lstrController, lstrAction);            
 
             if (this.EhAcessoLiberado(lstrAplicacao) || _authService.HasPermission(lstrAplicacao))
             {
-                Debug.WriteLine(string.Format("{0}:{1}:ACESSO AUTORIZADO", lstrAplicacao, matricula));
+                Debug.WriteLine(string.Format("{0}/{1}: ACESSO AUTORIZADO", lstrAplicacao, matricula));
             }
             else if (! _authService.HasPermission(lstrAplicacao))
             {
-                AcessoNegado(filtroContexto, string.Format("{0}:{1}", lstrAplicacao, matricula));                
+                AcessoNegado(filtroContexto, string.Format("{0}/{1}", lstrAplicacao, matricula));                
             }
             else
             {
@@ -97,8 +76,6 @@ public class SegurancaAutorizaActionFilter : ActionFilterAttribute, IAsyncAction
         }
     }
 
-    
-
     /// <summary>
     /// Redireciona para view de acesso negado
     /// </summary>
@@ -106,13 +83,11 @@ public class SegurancaAutorizaActionFilter : ActionFilterAttribute, IAsyncAction
     /// <param name="mensagem">Name = "mensagem"</param>
     private void AcessoNegado(ActionExecutingContext filtroContexto, string mensagem)
     {
-        _logger.LogInformation(string.Format("{0}:ACESSO NEGADO", mensagem));
+        _logger.LogInformation(string.Format("{0}: ACESSO NEGADO", mensagem));
 
         var routeValue = new RouteValueDictionary(new { action = "AcessoNegado", controller = "Home" });
 
         filtroContexto.Result = new RedirectToRouteResult(routeValue);
-        //filtroContexto.Result = new RedirectToRouteResult(
-        //        new System.Web.Routing.RouteValueDictionary(new { controller = "Home", action = "AcessoNegado" }));
     }
 
     /// <summary>
@@ -125,29 +100,12 @@ public class SegurancaAutorizaActionFilter : ActionFilterAttribute, IAsyncAction
     {
         string[] larrAcessoLiberado = new string[]
         {
-           "Home:Index",        // PAGINA INICIAL DA APLICACAO
-           "Home:AcessoNegado", // ACESSO NEGADO
-           "Home:EmManutencao",  // MANUTENCAO
-           "Home:ErroDocumento", //ERRO DOCUMENTO
-           "Home:Erro", //ERRO
-           "Home:Logout", // SAIR
-           "Home:ErroUsuario", // ERRO USUÁRIO
-           "DenunciaAuditoria:AcompanhamentoDenuncia",
-           "TrabalhoAuditoria:ObterRoteiroAuditoria", // ACTION DE CARREGAMENTO DE COMBO DO TRABALHO
-           "TrabalhoAuditoria:ObterModalidadesAuditoria", // ACTION DE CARREGAMENTO DE COMBO DO TRABALHO
-           "TrabalhoAuditoria:ObterTiposDeAuditoria", // ACTION DE CARREGAMENTO DE COMBO DO TRABALHO
-           "TrabalhoAuditoria:TipoTrabalhoRequerObjetoAuditoria", // ACTION DE CARREGAMENTO DE COMBO DO TRABALHO
-           "TrabalhoAuditoria:ObterObjetoAuditoria", // ACTION DE CARREGAMENTO DE COMBO DO TRABALHO
-           "TrabalhoAuditoria:ObterUnidadeGestoraAuditoria", // ACTION DE CARREGAMENTO DE COMBO DO TRABALHO
-           "TrabalhoAuditoria:ObterExecutorAuditoria", // ACTION DE CARREGAMENTO DE COMBO DO TRABALHO
-           "TrabalhoAuditoria:ObterGrupoResponsavelAuditoria", // ACTION DE CARREGAMENTO DE COMBO DO TRABALHO
-           "TrabalhoAuditoria:ObterCoordenadorTrabalholAuditoria", // ACTION DE CARREGAMENTO DE COMBO DO TRABALHO
-           "TrabalhoAuditoria:ObterModalidadesAuditoriaSituacaoS3" // ACTION DE VALIÇÃO DE CAMPO DO TRABALHO
+           "Home/Index",        // PAGINA INICIAL DA APLICACAO
+           "Home/AcessoNegado", // ACESSO NEGADO
+           "Home/Erro", //ERRO
+           "Home/Logout" // SAIR
         };
-        //var lstrActionsPublicas = _unitOfWork.ConstantesEVariaveisService.ObterConstantesEVariaveisPeloNome(Constantes.ConstNomeAcoesPublicas).FirstOrDefault().Valor;
 
-        // string[] larrActionsPublicas = lstrActionsPublicas.Split(',');
-
-        return true; // larrAcessoLiberado.Union(larrActionsPublicas).Contains<string>(identificador);
+        return larrAcessoLiberado.Contains<string>(identificador);
     }
 }

@@ -12,12 +12,6 @@
 <input id="document-id" data-document-id="new" type="hidden" />
 <input id="usuario-logado" type="hidden" value="@ViewBag.UsuarioLogado" />
 <div class="ui content">
-    <div class="ui modal" id="loading-modal">
-        <div class="ui active dimmer">
-            <div class="ui indeterminate text loader">Aguarde...</div>
-        </div>
-        <p></p>
-    </div>
     <div class="ui container">
         <div class="ui grid">
             <div class="sixteen wide column">
@@ -224,7 +218,7 @@
 
                                     <div class="fields">
                                         <a class="ui button bgm-gray-bnb" id="btn-limpar" onclick="LimparCamposButton()">Limpar campos</a>
-                                        <button class="ui button bgm-wine-bnb icon labeled" type="submit" id="save-button">
+                                        <button class="ui button bgm-wine-bnb icon labeled" type="submit" id="save-button" tabindex="11">
                                             <i class="save icon"></i>
                                             Manifestar interesse
                                         </button>

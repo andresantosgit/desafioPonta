@@ -39,28 +39,24 @@ public class CarteiraHostedService : IHostedService
                     var carteiraRepository = scope.ServiceProvider.GetRequiredService<ICarteiraRepository>();
                     var cobrancaRepository = scope.ServiceProvider.GetRequiredService<ICobrancaRepository>();
                     var atualizarCarteiraEventHandler = scope.ServiceProvider.GetRequiredService<IRequestHandler<DomainEvent<AtualizarCarteiraEvent>, CarteiraEntity>>();
-                    var carteiras = await carteiraRepository.FindAllByStatusAndDateAsync("ATIVA", cancellationToken);
+                    var carteiras = await carteiraRepository.FindAllByStatusAsync("ATIVA", cancellationToken);
 
                     foreach (var carteira in carteiras)
                     {
-                        if(new DateTime(carteira.DataCriacao.Year, carteira.DataCriacao.Month, carteira.DataCriacao.Day, 23, 59, 59) < DateTime.Now)
+                        var retornoCobranca = await cobrancaRepository.GetByTxId(carteira.TxId, cancellationToken);
+                        if (retornoCobranca != null && retornoCobranca.TxId != null && retornoCobranca.Status != null)
                         {
-                            var evento = new DomainEvent<AtualizarCarteiraEvent>(new(carteira.Id, carteira.IdInvestidor, "EXPIRADO"));
+                            var evento = new DomainEvent<AtualizarCarteiraEvent>(new(
+                                carteira.Id,
+                                carteira.IdInvestidor,
+                                (retornoCobranca.Status == "ATIVA" && carteira.DataCriacao.Day != DateTime.Now.Day) ? "EXPIRADO" : retornoCobranca.Status));
+
                             await atualizarCarteiraEventHandler.Handle(evento, cancellationToken);
-                        }
-                        else
-                        {
-                            var retornoCobranca = await cobrancaRepository.GetByTxId(carteira.TxId, cancellationToken);
-                            if (retornoCobranca.TxId != null && retornoCobranca.Status != null)
-                            {
-                                var evento = new DomainEvent<AtualizarCarteiraEvent>(new(carteira.Id, carteira.IdInvestidor, retornoCobranca.Status));
-                                await atualizarCarteiraEventHandler.Handle(evento, cancellationToken);
-                            }
                         }
                     }
                 }
             }
-            catch(Exception err)
+            catch (Exception err)
             {
 
             }

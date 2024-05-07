@@ -13,10 +13,8 @@
 });
 
 function ConsultarManifestos(cpfCnpj) {
-    if (cpfCnpj) {
-        $('#btn-consultarManifestos').prop('disabled', true);
-        ListarManifestos(cpfCnpj);
-    }
+    $('#btn-consultarManifestos').prop('disabled', true);
+    ListarManifestos(cpfCnpj);
 }
 
 function ListarManifestos(cpfCnpj) {

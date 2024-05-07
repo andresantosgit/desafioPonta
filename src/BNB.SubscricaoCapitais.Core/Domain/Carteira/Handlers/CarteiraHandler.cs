@@ -8,7 +8,6 @@ using BNB.ProjetoReferencia.Core.Domain.Cliente.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualBasic;
 
 namespace BNB.ProjetoReferencia.Core.Domain.Carteira.Handlers;
 
@@ -83,20 +82,9 @@ public class CarteiraHandler :
         };
 
         if (cliente.IdInvestidor.Length > 15)
-        {
             cobranca.Devedor.Cnpj = idInvestidor;
-        }
         else
-        {
             cobranca.Devedor.Cpf = idInvestidor;
-        }
-
-        //carteira.TxId = "test";
-        //carteira.Status = "ATIVA";
-        //carteira.PixCopiaECola = "testee copia e cola";
-        //var novaCarteira = await _carteiraRepository.AddAsync(carteira, cancellationToken);
-        //await _carteiraRepository.SaveAsync(cancellationToken);
-        //return novaCarteira;
 
         var retornoCobranca = await _cobrancaRepository.Add(cobranca, cancellationToken);
 
@@ -110,11 +98,8 @@ public class CarteiraHandler :
 
             return novaCarteira;
         }
-        else
-        {
-            throw new RulesException("CriacaoPagamentoError", "Erro ao criar chave PIX.");
-        }
 
+        throw new RulesException("CriacaoPagamentoError", "Erro ao criar chave PIX.");
     }
 
     public async Task<CarteiraEntity> Handle(DomainEvent<CancelarCarteiraEvent> @event, CancellationToken cancellationToken)

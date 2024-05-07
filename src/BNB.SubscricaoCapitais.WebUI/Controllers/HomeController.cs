@@ -1,4 +1,5 @@
-﻿using BNB.ProjetoReferencia.WebUI.Models;
+﻿using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
+using BNB.ProjetoReferencia.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -7,14 +8,17 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
     public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IAuthService _authService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IAuthService authService)
         {
             _logger = logger;
+            _authService = authService;
         }
 
         public IActionResult Index()
         {
+            ViewBag.Colaborador = _authService.GetCredencial();
             return View();
         }
 
@@ -30,8 +34,18 @@ namespace BNB.ProjetoReferencia.WebUI.Controllers
         /// <returns>Redireciona ao Home.</returns>
         public ActionResult Logout()
         {
-            AutorizadorService.Logout(this.HttpContext.Request);
+            _authService.Logout(this.HttpContext.Request);
             return this.RedirectToAction("Index", "Home");
+        }
+
+        /// <summary>
+        /// Acesso negado View
+        /// </summary>
+        /// <returns>Retorna a view de acesso negado</returns>
+        public ActionResult AcessoNegado()
+        {
+            ViewBag.Colaborador = _authService.GetCredencial();
+            return this.View();
         }
     }
 }

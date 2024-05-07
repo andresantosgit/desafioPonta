@@ -10,8 +10,10 @@ $(document).ready(function () {
         e.preventDefault();
         var cpfCnpj = $('#CPFOuCNPJ').val();
 
-        ConsultarDados(cpfCnpj);
-        ConsultarManifestos(cpfCnpj);
+        if (cpfCnpj) {
+            ConsultarDados(cpfCnpj);
+            ConsultarManifestos(cpfCnpj);
+        }
     });
 
     $('#Quantidade').on('change', function (e) {
@@ -23,29 +25,58 @@ $(document).ready(function () {
         e.preventDefault();
         AtualizarCliente();
     });
+
+    $('#save-button').on('click', function (e) {
+        e.preventDefault();
+        RegistrarManifesto();
+    });
 });
 
+function RegistrarManifesto() {
+    var model = $("form").serialize();
+    $('#loadingModal').modal('show');
+    $.ajax({
+        type: 'POST',
+        url: ROOT_URL + '/Manifesto/Registrar',
+        data: model,
+    }).done(function (data, textStatus, jqXHR) {
+        $("html, body").animate({ scrollTop: $('html, body').height() }, 1500, "easeInOutExpo");
+        popUpGerarPix(data.Id);
+    }).fail(function (request, textStatus, errorThrown) {
+        showMessage('negative', 'Não foi possível realizar o manifesto.');
+
+        var vm = request.responseJSON;
+        if (request.status === 400 && request.responseJSON !== undefined && request.responseJSON !== null) {
+            $.ajax({
+                type: 'POST',
+                url: ROOT_URL + '/Erros/MostrarErrosValidacao',
+                contentType: 'application/json',
+                data: JSON.stringify({ erros: vm })
+            }).done(function (data) {
+                $('#erros-validacao').html(data);
+            }).fail(function (error) {
+                console.log('Implementar error generico no controller de erros.');
+            });
+        }
+    }).always(function () {
+        $('#loadingModal').modal('hide');
+        $('.ui.modal').modal('hide');
+    });
+}
 function AtualizarCliente() {
     var model = $("form").serialize();
     var cpfCnpj = $('#CPFOuCNPJ').val();
     if (cpfCnpj) {
-        $('.ui.modal')
-            .modal({
-                closable: false
-            })
-            .modal('show');
-
+        $('#loadingModal').modal('show');
         $.ajax({
             type: 'POST',
             url: ROOT_URL + '/Manifesto/AtualizarCliente',
             data: model,
         }).done(function (data, textStatus, jqXHR) {
             $("html, body").animate({ scrollTop: $('html, body').height() }, 1500, "easeInOutExpo");
-            $('.ui.modal').modal('hide');
             PreencheCampos(data);
             showMessage('positive', 'Cliente atualizado com sucesso!');
         }).fail(function (request, textStatus, errorThrown) {
-            $('.ui.modal').modal('hide');
             showMessage('negative', 'Não foi possível atualizar o cliente.');
 
             var vm = request.responseJSON;
@@ -61,13 +92,17 @@ function AtualizarCliente() {
                     console.log('Implementar error generico no controller de erros.');
                 });
             }
+        }).always(function () {
+            $('#loadingModal').modal('hide');
+            $('.ui.modal').modal('hide');
         });
     }
 }
 
-
 function ConsultarDados(cpfCnpj) {
     if (cpfCnpj) {
+        $('#loadingModal').modal('show');
+
         $.ajax({
             type: 'POST',
             url: ROOT_URL + '/Manifesto/ConsultarDados',
@@ -75,10 +110,8 @@ function ConsultarDados(cpfCnpj) {
                 cpfCnpj: cpfCnpj
             }
         }).done(function (data, textStatus, jqXHR) {
-            $('.ui.modal').modal('hide');
             PreencheCampos(data);
         }).fail(function (request, textStatus, errorThrown) {
-            $('.ui.modal').modal('hide');
 
             if (request.status === 404) {
                 textStatus = 'Cliente não encontrado!';
@@ -87,8 +120,11 @@ function ConsultarDados(cpfCnpj) {
             showMessage('negative', textStatus);
             LimparCampos();
             $('#CPFOuCNPJ').val(cpfCnpj);
+        }).always(function () {
+            $('#loadingModal').modal('hide');
+            $('.ui.modal').modal('hide');
         });
-    }    
+    }
 }
 
 function PreencheCampos(lstRetorno) {
