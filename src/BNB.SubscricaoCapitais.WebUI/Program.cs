@@ -1,19 +1,22 @@
-using AutoMapper;
-using BNB.ProjetoReferencia.WebUI.Filters;
+using BNB.ProjetoReferencia.Core.Common.Extensions;
 using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities;
 using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
-using BNB.S095.BNBAuth.Middleware;
-using System.ComponentModel.DataAnnotations;
-using BNB.ProjetoReferencia.WebUI.Configuration;
 using BNB.ProjetoReferencia.Infrastructure.Common.Extensions;
-using BNB.ProjetoReferencia.Core.Common.Extensions;
-using BNB.ProjetoReferencia.Infrastructure.Https;
 using BNB.ProjetoReferencia.Infrastructure.Database;
-using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
-using BNB.ProjetoReferencia.Infrastructure.Http.MessageHandler;
-using BNB.ProjetoReferencia.Infrastructure.Http.Repositories;
+using BNB.ProjetoReferencia.Infrastructure.Https;
+using BNB.ProjetoReferencia.WebUI.Filters;
+using BNB.S095.BNBAuth.Middleware;
+using NLog.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add logging
+builder.Services.AddLogging(configure =>
+{
+    configure.ClearProviders();
+    configure.SetMinimumLevel(LogLevel.Trace);
+    configure.AddNLog("NLog.config");
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -21,8 +24,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddBNBAuthISKey(options =>
 {
     options.KeycloakResourceFile = BNBAuthDefaults.KeycloakResourceFile;
-    options.ISKeyUrl = "http://s2iisg01.dreads.bnb:8076/BN.S267.Autorizador";
-    options.ISKeySiglaSistema = "493SUBCAP";
+    options.ISKeyUrl = builder.Configuration["ISKey:Url"];
+    options.ISKeySiglaSistema = builder.Configuration["ISKey:SiglaSistema"];
 });
 
 // Filters

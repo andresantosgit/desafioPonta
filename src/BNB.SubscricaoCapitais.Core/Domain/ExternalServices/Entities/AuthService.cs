@@ -18,6 +18,8 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
         /// </summary>
         private readonly bnbauth.IUsuario _usuarioLogado;
 
+        private readonly bool _isISKeyDisabled;
+
         /// <summary>
         /// Construtor
         /// </summary>
@@ -25,12 +27,13 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
         /// <param name="colaboradorBNBService">Implementação do serviço de colaborador BNB</param>
         /// <param name="contextAccessor">Implementação do serviço de contexto HTTP</param>
         /// <param name="options">Implementação do serviço de configurações</param>
-        public AuthService(IHttpContextAccessor contextAccessor)
+        public AuthService(IHttpContextAccessor contextAccessor, IConfiguration configuration)
         {
             if (contextAccessor == null || contextAccessor.HttpContext == null) 
                 throw new ArgumentNullException(nameof(contextAccessor));
 
             _usuarioLogado = bnbauth.ContextoSeguranca.GetUsuarioLogado(contextAccessor?.HttpContext?.Request);
+            _isISKeyDisabled = configuration.GetValue<bool>("ISKey:Disabled"); ;
         }
 
         public string Matricula => _usuarioLogado.Username;
@@ -67,12 +70,12 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
 
         public bool HasPermission(string recurso, string? acao)
         {
-            return _usuarioLogado.HasPermission(recurso, acao);
+            return _isISKeyDisabled || _usuarioLogado.HasPermission(recurso, acao);
         }
 
         public bool HasPermission(string recurso)
         {
-            return _usuarioLogado.HasPermission(recurso, null);
+            return _isISKeyDisabled || _usuarioLogado.HasPermission(recurso, null);
         }
 
         public void Logout(HttpRequest request)
@@ -82,7 +85,7 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
 
         public bool PossuiLimitanteGlobal(string identificadorLimitante)
         {
-            return _usuarioLogado.HasPermission(Constantes.CodigoSistema, identificadorLimitante);
+            return _isISKeyDisabled || _usuarioLogado.HasPermission(Constantes.CodigoSistema, identificadorLimitante);
         }
 
         public ICredencial GetCredencial()
@@ -92,8 +95,8 @@ namespace BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities
                 Matricula = this.Matricula,
                 Nome = this.NomeCompleto,
                 Email = this.Email,
-                PossuiPermissaoMenuRegistrar = this.HasPermission("Manifesto/Registrar"),
-                PossuiPermissaoMenuConsultar = this.HasPermission("Manifesto/Consultar")
+                PossuiPermissaoMenuRegistrar = _isISKeyDisabled || this.HasPermission("Manifesto/Registrar"),
+                PossuiPermissaoMenuConsultar = _isISKeyDisabled || this.HasPermission("Manifesto/Consultar")
             };
         }
 

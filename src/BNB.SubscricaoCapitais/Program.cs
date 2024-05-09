@@ -1,29 +1,33 @@
 using BNB.ProjetoReferencia.Core.Common.Extensions;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.HostedServices;
-using BNB.ProjetoReferencia.Core.Domain.Cobranca.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Entities;
 using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Webhook.HostedServices;
 using BNB.ProjetoReferencia.Filters;
 using BNB.ProjetoReferencia.Infrastructure.Common.Extensions;
 using BNB.ProjetoReferencia.Infrastructure.Database;
-using BNB.ProjetoReferencia.Infrastructure.Http.Configuration;
-using BNB.ProjetoReferencia.Infrastructure.Http.MessageHandler;
-using BNB.ProjetoReferencia.Infrastructure.Http.Repositories;
 using BNB.ProjetoReferencia.Infrastructure.Https;
 using BNB.S095.BNBAuth.Middleware;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Internal;
 using Microsoft.OpenApi.Models;
+using NLog.Extensions.Logging;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add logging
+builder.Services.AddLogging(configure =>
+{
+    configure.ClearProviders();
+    configure.SetMinimumLevel(LogLevel.Trace);
+    configure.AddNLog("NLog.config");
+});
 
+// Add services to the container.
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -109,11 +113,12 @@ builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 

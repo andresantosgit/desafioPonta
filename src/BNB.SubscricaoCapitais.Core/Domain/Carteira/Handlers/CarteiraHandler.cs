@@ -137,15 +137,22 @@ public class CarteiraHandler :
     {
         foreach (PixEntity pix in @event.Model.listPix)
         {
-            var cobranca = await _cobrancaRepository.GetByTxId(pix.txid, cancellationToken);
-            var carteira = await _carteiraRepository.FindByTxIdAsync(pix.txid, cancellationToken);
-
-            if (cobranca != null && carteira != null && cobranca!.Status != null)
+            try
             {
-                carteira!.Status = cobranca!.Status;
-                carteira!.DataAtualizacao = DateTime.Now;
-                _carteiraRepository.Update(carteira);
-                await _carteiraRepository.SaveAsync(cancellationToken);
+                var cobranca = await _cobrancaRepository.GetByTxId(pix.txid, cancellationToken);
+                var carteira = await _carteiraRepository.FindByTxIdAsync(pix.txid, cancellationToken);
+
+                if (cobranca != null && carteira != null && cobranca!.Status != null)
+                {
+                    carteira!.Status = cobranca!.Status;
+                    carteira!.DataAtualizacao = DateTime.Now;
+                    _carteiraRepository.Update(carteira);
+                    await _carteiraRepository.SaveAsync(cancellationToken);
+                }
+            }
+            catch(Exception err)
+            {
+                //seguir para próximo item
             }
         }
 

@@ -1,5 +1,4 @@
-﻿using BNB.ProjetoReferencia.Core.Common.Extensions;
-using BNB.ProjetoReferencia.Core.Common.Interfaces;
+﻿using BNB.ProjetoReferencia.Core.Common.Interfaces;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Entities;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Events;
 using BNB.ProjetoReferencia.Core.Domain.Carteira.Interfaces;
@@ -9,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BNB.ProjetoReferencia.Core.Domain.Carteira.HostedServices;
 
-public class CarteiraHostedService : IHostedService
+public class CarteiraHostedService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
 
@@ -17,18 +16,7 @@ public class CarteiraHostedService : IHostedService
     {
         _serviceProvider = serviceProvider;
     }
-
-    public async Task StartAsync(CancellationToken cancellationToken)
-    {
-        ExecuteAsync(cancellationToken).NoWait();
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    protected async override Task ExecuteAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -74,3 +62,4 @@ public class CarteiraHostedService : IHostedService
         }
     }
 }
+

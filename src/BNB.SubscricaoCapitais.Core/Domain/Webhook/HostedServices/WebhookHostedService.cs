@@ -1,12 +1,11 @@
-﻿using BNB.ProjetoReferencia.Core.Common.Extensions;
-using BNB.ProjetoReferencia.Core.Domain.Webhook.Interfaces;
+﻿using BNB.ProjetoReferencia.Core.Domain.Webhook.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace BNB.ProjetoReferencia.Core.Domain.Webhook.HostedServices;
 
-public class WebhookHostedService : IHostedService
+public class WebhookHostedService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly string _urlCallback;
@@ -18,17 +17,7 @@ public class WebhookHostedService : IHostedService
         _urlCallback = configuration["UrlCallback"];
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
-    {
-        ExecuteAsync(cancellationToken).NoWait();
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {

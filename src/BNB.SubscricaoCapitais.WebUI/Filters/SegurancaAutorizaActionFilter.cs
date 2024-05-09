@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using BNB.ProjetoReferencia.Core.Domain.ExternalServices.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace BNB.ProjetoReferencia.WebUI.Filters;
 
@@ -26,12 +27,16 @@ public class SegurancaAutorizaActionFilter : ActionFilterAttribute, IAsyncAction
 
     private readonly IAuthService _authService;
 
+    private readonly bool _isISKeyDisabled;
+
     public SegurancaAutorizaActionFilter(
                 ILogger<SegurancaAutorizaActionFilter> logger,
-                IAuthService authService)
+                IAuthService authService,
+                IConfiguration configuration)
     {
         _logger = logger;
         _authService = authService;
+        _isISKeyDisabled = configuration.GetValue<bool>("ISKey:Disabled"); ;
     }
 
     /// <summary>
@@ -106,6 +111,6 @@ public class SegurancaAutorizaActionFilter : ActionFilterAttribute, IAsyncAction
            "Home/Logout" // SAIR
         };
 
-        return larrAcessoLiberado.Contains<string>(identificador);
+        return _isISKeyDisabled || larrAcessoLiberado.Contains<string>(identificador);
     }
 }

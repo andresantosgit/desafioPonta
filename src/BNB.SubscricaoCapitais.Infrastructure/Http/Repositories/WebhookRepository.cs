@@ -48,10 +48,13 @@ public class WebhookRepository
 
         _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _tokenService.GetToken());
 
-        using var response = await _httpClient.PutAsync(uri, new StringContent(content), ctx);
-        if (!response.IsSuccessStatusCode) return default;
+        using var responseDelete = await _httpClient.DeleteAsync(uri, ctx);
+        if (!responseDelete.IsSuccessStatusCode) return default;
+        
+        using var responseUpdate = await _httpClient.PutAsync(uri, new StringContent(content), ctx);
+        if (!responseUpdate.IsSuccessStatusCode) return default;
 
-        var model = await response.Content.ReadFromJsonAsync<WebhookModel>(cancellationToken: ctx);
+        var model = await responseUpdate.Content.ReadFromJsonAsync<WebhookModel>(cancellationToken: ctx);
         return Map(model);
     }
        
