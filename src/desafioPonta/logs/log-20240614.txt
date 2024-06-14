@@ -1609,3 +1609,5 @@ desafioPonta.Core.Common.Exceptions.RulesException: Exception of type 'desafioPo
 2024-06-14 11:50:29.759 -03:00 [INF] Tarefa excluída com sucesso: 1
 2024-06-14 11:50:29.761 -03:00 [INF] HTTP DELETE /api/v1/tarefas/1 responded 200 in 17.4023 ms
 2024-06-14 11:50:29.763 -03:00 [INF] HTTP DELETE /api/v1/tarefas/1 responded 200 in 22.9963 ms
+2024-06-14 13:53:58.178 -03:00 [INF] HTTP GET /swagger/index.html responded 200 in 513.6926 ms
+2024-06-14 13:53:59.123 -03:00 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 309.5400 ms
